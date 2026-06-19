@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skills Manager</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-frame">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">SM</div>
+          <div>
+            <h1>Skills Manager</h1>
+            <p data-i18n="app.tagline">Discover, review, and copy local Agent Skills</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="version-pill">v0.5.0</span>
+          <label class="language-switch">
+            <span data-i18n="app.language">Language</span>
+            <select id="languageSelect" aria-label="Language">
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+            </select>
+          </label>
+        </div>
+      </header>
+
+      <main class="shell">
+        <aside class="sidebar" aria-label="Workspace navigation">
+          <nav class="workspace-nav" aria-label="Workspaces">
+            <button type="button" data-view="setup">
+              <strong data-i18n="nav.setup">Discover</strong>
+              <span data-i18n="nav.setupHint">Find existing skills</span>
+            </button>
+            <button type="button" data-view="skills">
+              <strong data-i18n="nav.skills">Review</strong>
+              <span data-i18n="nav.skillsHint">Decide what enters the library</span>
+            </button>
+            <button type="button" data-view="library">
+              <strong data-i18n="nav.library">My Library</strong>
+              <span data-i18n="nav.libraryHint">Ready to copy</span>
+            </button>
+            <button type="button" data-view="import">
+              <strong data-i18n="nav.import">Get Skills</strong>
+              <span data-i18n="nav.importHint">Folder, Git, or archive</span>
+            </button>
+            <button type="button" data-view="profiles">
+              <strong data-i18n="nav.profiles">Agent Folders</strong>
+              <span data-i18n="nav.profilesHint">Where skills are copied</span>
+            </button>
+          </nav>
+
+        </aside>
+
+        <section class="work-pane" aria-label="Workspace">
+          <div class="workspace-header">
+            <div>
+              <div class="workspace-kicker" id="workspaceKicker">Setup</div>
+              <h2 id="workspaceTitle">First Run Import</h2>
+              <p id="workspaceSubtitle">Review existing local skills before adding them to your library.</p>
+            </div>
+            <button id="refreshButton" type="button" data-i18n="actions.refresh">Scan Mac</button>
+          </div>
+
+          <div id="statusLine" class="status-line" role="status" aria-live="polite">Loading local skills...</div>
+
+          <section id="viewSetup" class="view-panel" data-view-panel="setup">
+            <section id="firstRunImport" class="first-run-import hidden" aria-label="First run import"></section>
+            <div class="empty-card" id="firstRunDone">
+              <h3 data-i18n="setup.doneTitle">Local console is ready</h3>
+              <p data-i18n="setup.doneBody">Your Mac has been scanned. Review discovered skills, get new ones, or copy library skills to an agent.</p>
+            </div>
+            <section class="discover-card roots" aria-label="Scanned roots">
+              <div class="section-title" data-i18n="sections.scannedRoots">Scanned Roots</div>
+              <div id="rootList" class="root-list"></div>
+            </section>
+          </section>
+
+          <section id="viewSkills" class="view-panel" data-view-panel="skills">
+            <div class="scope-note" data-i18n="skills.scopeNote">
+              This is the full list found by scanning your Mac. Found only means it still lives in an agent folder; In library means it has been added locally; Copied means it is available in an agent.
+            </div>
+            <div class="toolbar">
+              <input id="searchInput" type="search" data-i18n-placeholder="filters.search" placeholder="Search skills, tools, paths" />
+              <select id="riskFilter" aria-label="Risk filter">
+                <option value="all" data-i18n="filters.allRisks">All risks</option>
+                <option value="high" data-i18n="risk.high">High</option>
+                <option value="medium" data-i18n="risk.medium">Medium</option>
+                <option value="low" data-i18n="risk.low">Low</option>
+              </select>
+              <select id="toolFilter" aria-label="Tool filter">
+                <option value="all" data-i18n="filters.allTools">All tools</option>
+              </select>
+            </div>
+            <div id="skillList" class="skill-list"></div>
+          </section>
+
+          <section id="viewLibrary" class="view-panel" data-view-panel="library">
+            <div id="libraryList" class="library-list"></div>
+          </section>
+
+          <section id="viewImport" class="view-panel" data-view-panel="import">
+            <form id="sourceImportForm" class="source-import-form">
+              <label class="source-primary">
+                <span data-i18n="import.source">Source</span>
+                <input
+                  id="sourceInput"
+                  name="source"
+                  data-i18n-placeholder="import.sourcePlaceholder"
+                  placeholder="/path/to/skill, Git URL, .zip/.tar, or owner/repo"
+                  autocomplete="off"
+                />
+              </label>
+              <details class="advanced-import-options">
+                <summary data-i18n="import.advanced">Optional settings, usually not needed</summary>
+                <p class="advanced-import-note" data-i18n="import.advancedNote">
+                  Most skills do not need these. Use them only when the source has multiple versions or folders.
+                </p>
+                <label>
+                  <span data-i18n="import.ref">Version or branch (optional)</span>
+                  <input name="ref" data-i18n-placeholder="import.refPlaceholder" placeholder="leave empty for default, or enter tag, branch, commit" autocomplete="off" />
+                </label>
+                <label>
+                  <span data-i18n="import.subdir">Skill folder inside source (optional)</span>
+                  <input name="subdir" data-i18n-placeholder="import.subdirPlaceholder" placeholder="only needed when the skill is not at repo root" autocomplete="off" />
+                </label>
+                <label class="check-row">
+                  <input name="replace" type="checkbox" />
+                  <span data-i18n="import.replace">Allow replacing a same-name skill in My Library</span>
+                </label>
+                <label class="check-row">
+                  <input name="pin" type="checkbox" />
+                  <span data-i18n="import.pin">Lock to the checked commit</span>
+                </label>
+              </details>
+              <div class="source-import-actions">
+                <button id="previewSourceButton" type="button" data-i18n="actions.preview">Check skill</button>
+                <button id="installSourceButton" type="button" data-i18n="actions.install">Add to library</button>
+              </div>
+            </form>
+            <section id="sourceHistory" class="source-history" aria-label="Recent sources"></section>
+            <details class="ai-settings-panel">
+              <summary data-i18n="ai.settingsTitle">AI interpretation settings (optional)</summary>
+              <p class="advanced-import-note" data-i18n="ai.settingsBody">
+                Use an OpenAI-compatible endpoint. The API key stays on this Mac and is never shown again.
+              </p>
+              <form id="aiSettingsForm" class="ai-settings-form">
+                <label class="check-row">
+                  <input name="enabled" type="checkbox" />
+                  <span data-i18n="ai.enabled">Enable AI interpretation</span>
+                </label>
+                <label>
+                  <span data-i18n="ai.provider">Model provider</span>
+                  <select name="provider" id="aiProviderSelect">
+                    <option value="openai-compatible" data-i18n="ai.providerCustom">Custom OpenAI-compatible</option>
+                    <option value="deepseek" data-i18n="ai.providerDeepseek">DeepSeek</option>
+                    <option value="qwen-dashscope" data-i18n="ai.providerQwenDashscope">Qwen / Alibaba Cloud Model Studio</option>
+                    <option value="kimi" data-i18n="ai.providerKimi">Kimi / Moonshot</option>
+                    <option value="zhipu" data-i18n="ai.providerZhipu">GLM / Zhipu</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="ai.baseUrl">Base URL</span>
+                  <input name="baseUrl" data-i18n-placeholder="ai.baseUrlPlaceholder" placeholder="https://api.openai.com/v1" autocomplete="off" />
+                </label>
+                <label>
+                  <span data-i18n="ai.model">Model</span>
+                  <input name="model" data-i18n-placeholder="ai.modelPlaceholder" placeholder="gpt-5.5" autocomplete="off" />
+                </label>
+                <label>
+                  <span data-i18n="ai.apiKey">API key</span>
+                  <input name="apiKey" type="password" data-i18n-placeholder="ai.apiKeyPlaceholder" placeholder="Leave blank to keep existing key" autocomplete="off" />
+                </label>
+                <div class="ai-settings-actions">
+                  <button type="submit" data-i18n="ai.save">Save AI settings</button>
+                  <button id="testAiSettingsButton" type="button" class="secondary-button" data-i18n="ai.test">Test connection</button>
+                </div>
+                <div id="aiSettingsFeedback" class="ai-settings-feedback hidden" role="status" aria-live="polite"></div>
+              </form>
+            </details>
+            <div id="sourcePreview" class="source-preview"></div>
+          </section>
+
+          <section id="viewProfiles" class="view-panel" data-view-panel="profiles">
+            <div id="profilesPanel" class="profiles-panel"></div>
+          </section>
+        </section>
+
+        <section class="detail-pane" aria-label="Details">
+          <div class="inspector-topline">
+            <span id="inspectorTitle" data-i18n="inspector.title">Details</span>
+            <strong id="inspectorContext" data-i18n="inspector.current">Current selection</strong>
+          </div>
+          <div id="emptyDetail" class="empty-detail">
+            <h2 id="emptyDetailTitle">Select a skill</h2>
+            <p id="emptyDetailBody">Review metadata, files, risk hints, and local path details.</p>
+          </div>
+          <article id="skillDetail" class="skill-detail hidden"></article>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

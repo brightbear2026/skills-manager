@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+.env
+dist/
+coverage/
+.skillsmanger-cache/
+src-tauri/target/
+src-tauri/gen/schemas/
+src-tauri/icons/android/
+src-tauri/icons/ios/

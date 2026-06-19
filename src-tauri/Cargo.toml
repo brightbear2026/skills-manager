@@ -1,0 +1,12 @@
+[package]
+name = "skills-manager"
+version = "0.5.0"
+description = "Local Agent Skills console for macOS"
+authors = ["Skills Manager"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }

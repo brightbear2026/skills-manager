@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Skills Manager",
+  "version": "0.5.0",
+  "identifier": "com.skillsmanager.local",
+  "build": {
+    "beforeDevCommand": "npm run app:ensure-ready",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run app:stage-resources",
+    "frontendDist": "../public"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "Local Agent Skills console",
+    "longDescription": "Discover, review, collect, and copy local Agent Skills on this Mac.",
+    "resources": {
+      "../.skillsmanger-cache/app-resources": "app"
+    },
+    "macOS": {
+      "dmg": {
+        "background": "assets/dmg-background.png",
+        "windowSize": {
+          "width": 660,
+          "height": 400
+        },
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skills Manager 启动问题</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f8fb;
+        --card: #ffffff;
+        --text: #111827;
+        --muted: #667085;
+        --border: #d7dee8;
+        --accent: #0f766e;
+        --danger: #b42318;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "Segoe UI",
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      main {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        padding: 40px 24px;
+      }
+
+      section {
+        width: min(760px, 100%);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--card);
+        padding: 32px;
+        box-shadow: 0 16px 50px rgba(17, 24, 39, 0.08);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        background: #fee4e2;
+        color: var(--danger);
+        font-size: 14px;
+        font-weight: 700;
+        padding: 6px 12px;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: 32px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .panel {
+        margin-top: 24px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px;
+        background: #fbfcfe;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--muted);
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      code {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--text);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 14px;
+        padding: 2px 6px;
+      }
+
+      .footer {
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .en {
+        margin-top: 28px;
+        border-top: 1px solid var(--border);
+        padding-top: 22px;
+      }
+
+      .en p {
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section>
+        <span class="badge">本地服务未启动</span>
+        <h1>Skills Manager 暂时打不开</h1>
+        <p>
+          APP 已启动，但本地 Skills Manager 服务没有准备好。你的 skills
+          文件不会被修改。
+        </p>
+
+        <div class="panel">
+          <h2>可以先检查这些位置</h2>
+          <ul>
+            <li>启动错误：<code>~/.skillsmanager/logs/native-startup-error.log</code></li>
+            <li>服务日志：<code>~/.skillsmanager/logs/service.err.log</code></li>
+            <li>确认 5173 端口没有被其他 Skills Manager 进程占用。</li>
+          </ul>
+        </div>
+
+        <p class="footer">
+          关闭这个窗口会退出 APP。重新打开后，Skills Manager 会再次尝试启动本地服务。
+        </p>
+
+        <div class="en">
+          <span class="badge">Local service unavailable</span>
+          <h1>Skills Manager could not open</h1>
+          <p>
+            The desktop shell started, but the local service did not become ready.
+            Your skills were not changed.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

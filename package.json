@@ -1,0 +1,31 @@
+{
+  "name": "skillsmanger",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "A macOS-first local control console for Agent Skills.",
+  "scripts": {
+    "dev": "node src/server.mjs",
+    "start": "node src/server.mjs",
+    "health": "node src/cli.mjs health",
+    "service:status": "node src/cli.mjs service:status",
+    "app:launch-plan": "node src/cli.mjs app:launch-plan",
+    "app:ensure-ready": "node src/cli.mjs app:ensure-ready",
+    "app:resource-manifest": "node src/cli.mjs app:resource-manifest",
+    "app:stage-resources": "node src/cli.mjs app:stage-resources",
+    "app:preflight": "node src/cli.mjs app:preflight",
+    "app:signing-preflight": "node src/cli.mjs app:signing-preflight",
+    "app:assets": "node scripts/generate-release-assets.mjs",
+    "app:build-local": "node scripts/build-local-release.mjs",
+    "tauri:dev": "node src/tauriRunner.mjs dev",
+    "tauri:build": "node src/tauriRunner.mjs build",
+    "service:config": "node src/cli.mjs service:config",
+    "service:plist": "node src/cli.mjs service:plist",
+    "export": "node src/cli.mjs export",
+    "scan": "node src/server.mjs --scan",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
