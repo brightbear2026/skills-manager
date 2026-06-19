@@ -81,7 +81,7 @@ npm run tauri:dev
 npm run app:build-local
 ```
 
-`app:build-local` creates an unsigned local `.app` and `.dmg`. Public distribution still
+`app:build-local` creates an ad-hoc signed local `.app` and `.dmg`. Public distribution still
 requires signing, notarization, and QA.
 
 ## Runtime Decision

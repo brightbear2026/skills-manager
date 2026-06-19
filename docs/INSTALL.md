@@ -19,7 +19,7 @@ Releases:
 
 ## If macOS Blocks The App
 
-The current test build is unsigned and not notarized. On first launch, macOS may say that it cannot verify the developer.
+The current test build is ad-hoc signed, but it is not Developer ID signed or Apple-notarized. On first launch, macOS may say that it cannot verify the developer.
 
 To open it:
 
@@ -35,7 +35,7 @@ If macOS still blocks it:
 3. Find the Skills Manager warning.
 4. Choose `Open Anyway`.
 
-Company-managed or school-managed Macs may block unsigned apps entirely.
+Company-managed or school-managed Macs may block apps that are not Developer ID signed or notarized.
 
 ## Local Service
 

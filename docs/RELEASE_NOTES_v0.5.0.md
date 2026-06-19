@@ -21,7 +21,7 @@
 
 ### 重要说明
 
-当前 DMG 未签名、未公证，适合小范围测试。首次打开时，macOS 可能提示无法验证开发者，需要右键 App 选择“打开”。
+当前 DMG 使用 ad-hoc 签名，但没有 Developer ID 签名和 Apple notarization，适合小范围测试。首次打开时，macOS 可能提示无法验证开发者，需要右键 App 选择“打开”。
 
 API key 不会被打进 App 或 DMG。当前版本的 AI API key 会明文存储在本机 `~/.skillsmanager/ai-settings.json`，后续版本计划迁移到 macOS Keychain。
 
@@ -46,6 +46,6 @@ This is the first public test build of Skills Manager. The current product scope
 
 ### Important Notes
 
-The current DMG is unsigned and not notarized. It is suitable for small test distribution. On first launch, macOS may require right-clicking the app and choosing “Open”.
+The current DMG is ad-hoc signed, but it is not Developer ID signed or Apple-notarized. It is suitable for small test distribution. On first launch, macOS may require right-clicking the app and choosing “Open”.
 
 API keys are not bundled into the app or DMG. In the current version, AI API keys are stored locally in plain text at `~/.skillsmanager/ai-settings.json`. A future version should move them to macOS Keychain.

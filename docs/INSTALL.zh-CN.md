@@ -19,7 +19,7 @@ Release 页面：
 
 ## 如果 macOS 阻止打开
 
-当前测试包未签名、未公证。首次打开时，macOS 可能提示无法验证开发者。
+当前测试包使用 ad-hoc 签名，但没有 Developer ID 签名和 Apple notarization。首次打开时，macOS 可能提示无法验证开发者。
 
 可以这样打开：
 
@@ -35,7 +35,7 @@ Release 页面：
 3. 找到 Skills Manager 的拦截提示。
 4. 选择“仍要打开”。
 
-受公司或学校管理的 Mac 可能禁止运行未签名 App。
+受公司或学校管理的 Mac 可能禁止运行未 Developer ID 签名或未公证的 App。
 
 ## 本地服务
 

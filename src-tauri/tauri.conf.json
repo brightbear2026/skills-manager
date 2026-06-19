@@ -32,6 +32,7 @@
       "../.skillsmanger-cache/app-resources": "app"
     },
     "macOS": {
+      "signingIdentity": "-",
       "dmg": {
         "background": "assets/dmg-background.png",
         "windowSize": {
