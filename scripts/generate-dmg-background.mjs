@@ -9,11 +9,9 @@ const pixels = new Uint8Array(width * height * 4);
 
 const colors = {
   bg: [248, 251, 253, 255],
-  mint: [225, 247, 243, 255],
   border: [203, 213, 225, 255],
   teal: [15, 118, 110, 255],
   tealSoft: [165, 223, 214, 255],
-  text: [17, 24, 39, 255],
 };
 
 function setPixel(x, y, color) {
@@ -133,27 +131,9 @@ roundedRect(38, 36, 584, 328, 28, [255, 255, 255, 230]);
 roundedRect(39, 37, 582, 326, 27, [203, 213, 225, 90]);
 roundedRect(42, 40, 576, 320, 24, [255, 255, 255, 255]);
 
-roundedRect(116, 118, 128, 128, 28, colors.mint);
-roundedRect(128, 130, 104, 104, 22, [255, 255, 255, 180]);
-roundedRect(145, 153, 48, 14, 4, colors.teal);
-roundedRect(145, 153, 14, 48, 4, colors.teal);
-roundedRect(145, 187, 44, 14, 4, colors.teal);
-roundedRect(175, 187, 14, 48, 4, colors.teal);
-roundedRect(145, 221, 48, 14, 4, colors.teal);
-roundedRect(202, 153, 14, 82, 4, [17, 94, 89, 255]);
-roundedRect(220, 153, 14, 82, 4, [17, 94, 89, 255]);
-
-roundedRect(416, 118, 128, 128, 28, [239, 246, 255, 255]);
-roundedRect(432, 146, 96, 72, 14, [191, 219, 254, 255]);
-roundedRect(432, 134, 45, 22, 10, [147, 197, 253, 255]);
-roundedRect(432, 164, 96, 62, 12, [96, 165, 250, 255]);
-
 line(282, 182, 374, 182, 8, colors.tealSoft);
 line(372, 182, 350, 160, 8, colors.tealSoft);
 line(372, 182, 350, 204, 8, colors.tealSoft);
-
-roundedRect(118, 278, 124, 10, 5, [203, 213, 225, 170]);
-roundedRect(418, 278, 124, 10, 5, [203, 213, 225, 170]);
 
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, encodePng());
