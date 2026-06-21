@@ -397,7 +397,7 @@ export async function readSkill(skillDir, root) {
   });
   const publicFiles = files.map(({ preview, ...file }) => file);
   const dependencies = extractDependencyHints(parsed.frontmatterRaw, parsed.body);
-  const relativePath = path.relative(root.realPath, skillDir) || ".";
+  const relativePath = toPosixPath(path.relative(root.realPath, skillDir) || ".");
   const body = trimText(parsed.body, MAX_BODY_BYTES);
 
   return {
@@ -443,7 +443,7 @@ async function listSkillFiles(skillDir) {
 
     for (const entry of entries) {
       const fullPath = path.join(current.dir, entry.name);
-      const relativePath = path.relative(skillDir, fullPath);
+      const relativePath = toPosixPath(path.relative(skillDir, fullPath));
       if (entry.isDirectory()) {
         if (!SKIP_DIRS.has(entry.name) && current.depth < 4) {
           queue.push({ dir: fullPath, depth: current.depth + 1 });
@@ -454,8 +454,7 @@ async function listSkillFiles(skillDir) {
 
       const info = await lstat(fullPath);
       const extension = path.extname(entry.name);
-      const isScript =
-        relativePath.startsWith(`scripts${path.sep}`) || SCRIPT_EXTENSIONS.has(extension);
+      const isScript = relativePath.startsWith("scripts/") || SCRIPT_EXTENSIONS.has(extension);
       const file = {
         path: relativePath,
         size: info.size,
@@ -477,6 +476,10 @@ async function listSkillFiles(skillDir) {
   }
 
   return files.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function toPosixPath(relativePath) {
+  return String(relativePath).split(path.sep).join("/");
 }
 
 async function getUpdatedAt(filePath) {

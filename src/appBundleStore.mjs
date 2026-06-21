@@ -62,7 +62,7 @@ export function buildAppResourceManifest(options = {}) {
 }
 
 function bundledNodePath() {
-  return process.platform === "win32" ? path.join("node", "node.exe") : path.join("node", "bin", "node");
+  return process.platform === "win32" ? "node/node.exe" : "node/bin/node";
 }
 
 export async function stageAppResources(options = {}) {

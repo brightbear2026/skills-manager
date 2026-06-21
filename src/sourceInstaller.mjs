@@ -431,7 +431,7 @@ async function buildComparableFileMap(rootPath) {
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      const relativePath = path.relative(rootPath, fullPath);
+      const relativePath = toPosixPath(path.relative(rootPath, fullPath));
       if (entry.isDirectory()) {
         if (!SKIP_DIRS.has(entry.name)) queue.push(fullPath);
         continue;
@@ -538,7 +538,7 @@ async function listSourceFiles(skillPath) {
 
     for (const entry of entries) {
       const fullPath = path.join(current.dir, entry.name);
-      const relativePath = path.relative(skillPath, fullPath);
+      const relativePath = toPosixPath(path.relative(skillPath, fullPath));
       if (entry.isDirectory()) {
         if (!SKIP_DIRS.has(entry.name) && current.depth < 4) {
           queue.push({ dir: fullPath, depth: current.depth + 1 });
@@ -549,8 +549,7 @@ async function listSourceFiles(skillPath) {
 
       const info = await lstat(fullPath);
       const extension = path.extname(entry.name);
-      const isScript =
-        relativePath.startsWith(`scripts${path.sep}`) || SCRIPT_EXTENSIONS.has(extension);
+      const isScript = relativePath.startsWith("scripts/") || SCRIPT_EXTENSIONS.has(extension);
       const file = {
         path: relativePath,
         size: info.size,
@@ -571,6 +570,10 @@ async function listSourceFiles(skillPath) {
   }
 
   return files.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function toPosixPath(relativePath) {
+  return String(relativePath).split(path.sep).join("/");
 }
 
 async function assertReadableDirectory(inputPath) {

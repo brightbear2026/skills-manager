@@ -279,12 +279,14 @@ test("service manager builds health payloads and launchd plists", async () => {
   assert.ok(resourceManifest.exclude.includes("src-tauri/target"));
   assert.match(await readFile(path.join(staged.outputDir, "src", "server.mjs"), "utf8"), /createServer/);
   assert.match(await readFile(path.join(staged.outputDir, "public", "index.html"), "utf8"), /Skills Manager/);
-  assert.ok((await lstat(path.join(staged.outputDir, "node", "bin", "node"))).size > 1_000_000);
+  const stagedNodePath = resourceManifest.generated.find((item) => item.reason.includes("Node runtime"))?.path;
+  assert.ok(stagedNodePath);
+  assert.ok((await lstat(path.join(staged.outputDir, ...stagedNodePath.split("/")))).size > 1_000_000);
   const stagedManifest = JSON.parse(await readFile(staged.manifestPath, "utf8"));
   assert.equal(path.basename(staged.manifestPath), "skillsmanager-resource-manifest.json");
   assert.equal(stagedManifest.outputDir, staged.outputDir);
   assert.ok(stagedManifest.copied.some((item) => item.path === "public"));
-  assert.ok(stagedManifest.copied.some((item) => item.path === "node/bin/node"));
+  assert.ok(stagedManifest.copied.some((item) => item.path === stagedNodePath));
   assert.equal(preflightReady.ready, true);
   assert.equal(preflightReady.nextActions.length, 0);
   assert.equal(preflightMissingTools.ready, false);
