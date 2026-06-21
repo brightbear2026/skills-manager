@@ -7,12 +7,13 @@
 Skills Manager 是一个 **本地 Agent Skills 控制台**。它会自动发现这台 Mac 上已有的 Agent Skills，帮助你集中查看、审查风险、加入本机库，并按需复制到 Claude Code、Codex、OpenClaw 或自定义 Agent 的 skills 目录。
 
 > 当前版本：`v0.5.1`  
-> 当前打包：macOS Apple Silicon / aarch64  
-> 说明：当前 DMG 是 ad-hoc signed，但没有 Developer ID 签名和 Apple notarization，适合小范围试用。首次打开可能需要右键 App 选择“打开”。
+> 当前打包：macOS Apple Silicon / Windows x64  
+> 说明：当前安装包未做正式代码签名。macOS 首次打开可能需要右键 App 选择“打开”；Windows 可能出现 SmartScreen 提示，需要选择继续运行。
 
 ### 下载
 
 - macOS Apple Silicon DMG: [Skills-Manager_0.5.1_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_aarch64.dmg)
+- Windows x64 installer: [Skills-Manager_0.5.1_x64-setup.exe](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_x64-setup.exe)
 - Release 页面: [GitHub Releases](https://github.com/brightbear2026/skills-manager/releases)
 
 ### 它解决什么问题
@@ -115,12 +116,13 @@ npm run app:signing-preflight
 Skills Manager is a **local Agent Skills console** for macOS. It discovers Agent Skills already on your Mac, helps you review risk signals, collects trusted skills into a local library, and copies selected skills into Claude Code, Codex, OpenClaw, or custom Agent skill folders.
 
 > Current version: `v0.5.1`  
-> Current build: macOS Apple Silicon / aarch64  
-> Note: the current DMG is ad-hoc signed, but it is not Developer ID signed or Apple-notarized. It is suitable for small test distribution. On first launch, macOS may require right-clicking the app and choosing “Open”.
+> Current build: macOS Apple Silicon / Windows x64  
+> Note: current installers are not formally code-signed. On macOS, first launch may require right-clicking the app and choosing “Open”. On Windows, SmartScreen may show a warning and require choosing to run anyway.
 
 ### Download
 
 - macOS Apple Silicon DMG: [Skills-Manager_0.5.1_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_aarch64.dmg)
+- Windows x64 installer: [Skills-Manager_0.5.1_x64-setup.exe](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_x64-setup.exe)
 - Releases: [GitHub Releases](https://github.com/brightbear2026/skills-manager/releases)
 
 ### Why It Exists

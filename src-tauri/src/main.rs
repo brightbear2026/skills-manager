@@ -40,6 +40,11 @@ fn main() {
 
 #[tauri::command]
 fn pick_agent_skill_folder() -> Result<Option<String>, String> {
+    pick_agent_skill_folder_impl()
+}
+
+#[cfg(target_os = "macos")]
+fn pick_agent_skill_folder_impl() -> Result<Option<String>, String> {
     let script = r#"POSIX path of (choose folder with prompt "Choose the Agent skills folder")"#;
     let output = Command::new("osascript")
         .arg("-e")
@@ -58,6 +63,38 @@ fn pick_agent_skill_folder() -> Result<Option<String>, String> {
     }
 
     Err(stderr.trim().to_string())
+}
+
+#[cfg(target_os = "windows")]
+fn pick_agent_skill_folder_impl() -> Result<Option<String>, String> {
+    let script = r#"
+Add-Type -AssemblyName System.Windows.Forms
+$dialog = New-Object System.Windows.Forms.FolderBrowserDialog
+$dialog.Description = 'Choose the Agent skills folder'
+$dialog.ShowNewFolderButton = $true
+if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+  [Console]::Out.Write($dialog.SelectedPath)
+}
+"#;
+    let output = Command::new("powershell")
+        .arg("-NoProfile")
+        .arg("-STA")
+        .arg("-Command")
+        .arg(script)
+        .output()
+        .map_err(|error| format!("Could not open folder picker: {error}"))?;
+
+    if output.status.success() {
+        let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        return Ok((!path.is_empty()).then_some(path));
+    }
+
+    Err(String::from_utf8_lossy(&output.stderr).trim().to_string())
+}
+
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+fn pick_agent_skill_folder_impl() -> Result<Option<String>, String> {
+    Err("Folder picker is not available on this platform. Paste the folder path manually.".into())
 }
 
 struct ServiceProcess(Mutex<Child>);
@@ -127,12 +164,31 @@ fn resolve_manager_home() -> PathBuf {
         return PathBuf::from(path);
     }
 
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(path) = env::var("APPDATA") {
+            return PathBuf::from(path).join("SkillsManager");
+        }
+        if let Ok(path) = env::var("USERPROFILE") {
+            return PathBuf::from(path).join(".skillsmanager");
+        }
+    }
+
     PathBuf::from(env::var("HOME").unwrap_or_else(|_| ".".to_string())).join(".skillsmanager")
 }
 
 fn resolve_node_path(resource_root: &PathBuf) -> PathBuf {
     if let Ok(path) = env::var("SKILLSMANGER_NODE_PATH") {
         return PathBuf::from(path);
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let bundled = resource_root.join("node").join("node.exe");
+        if bundled.exists() {
+            return bundled;
+        }
+        return PathBuf::from("node.exe");
     }
 
     let bundled = resource_root.join("node/bin/node");

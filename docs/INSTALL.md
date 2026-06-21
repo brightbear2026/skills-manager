@@ -6,6 +6,10 @@ macOS Apple Silicon:
 
 [Download Skills-Manager_0.5.1_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_aarch64.dmg)
 
+Windows x64:
+
+[Download Skills-Manager_0.5.1_x64-setup.exe](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_x64-setup.exe)
+
 Releases:
 
 [https://github.com/brightbear2026/skills-manager/releases](https://github.com/brightbear2026/skills-manager/releases)
@@ -36,6 +40,18 @@ If macOS still blocks it:
 4. Choose `Open Anyway`.
 
 Company-managed or school-managed Macs may block apps that are not Developer ID signed or notarized.
+
+## If Windows Shows SmartScreen
+
+The current Windows installer is not code-signed yet. Windows Defender SmartScreen may warn that the publisher is unknown.
+
+To open it:
+
+1. Choose `More info`.
+2. Choose `Run anyway`.
+3. Continue the installer.
+
+Company-managed or school-managed Windows PCs may block unsigned installers.
 
 ## Local Service
 

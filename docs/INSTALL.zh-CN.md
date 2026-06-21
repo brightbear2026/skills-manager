@@ -6,6 +6,10 @@ macOS Apple Silicon:
 
 [下载 Skills-Manager_0.5.1_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_aarch64.dmg)
 
+Windows x64:
+
+[下载 Skills-Manager_0.5.1_x64-setup.exe](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_x64-setup.exe)
+
 Release 页面：
 
 [https://github.com/brightbear2026/skills-manager/releases](https://github.com/brightbear2026/skills-manager/releases)
@@ -36,6 +40,18 @@ Release 页面：
 4. 选择“仍要打开”。
 
 受公司或学校管理的 Mac 可能禁止运行未 Developer ID 签名或未公证的 App。
+
+## 如果 Windows 出现 SmartScreen 提示
+
+当前 Windows 安装包还没有正式代码签名。Windows Defender SmartScreen 可能提示发布者未知。
+
+可以这样打开：
+
+1. 选择“更多信息”。
+2. 选择“仍要运行”。
+3. 继续安装。
+
+受公司或学校管理的 Windows 电脑可能禁止运行未签名安装包。
 
 ## 本地服务
 

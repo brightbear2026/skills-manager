@@ -41,7 +41,7 @@ export function buildAppResourceManifest(options = {}) {
     ],
     generated: [
       {
-        path: "node/bin/node",
+        path: bundledNodePath(),
         source: process.execPath,
         reason: "Bundled Node runtime used by the native app shell.",
       },
@@ -59,6 +59,10 @@ export function buildAppResourceManifest(options = {}) {
       "Choose the final icon, signing identity, and notarization workflow.",
     ],
   };
+}
+
+function bundledNodePath() {
+  return process.platform === "win32" ? path.join("node", "node.exe") : path.join("node", "bin", "node");
 }
 
 export async function stageAppResources(options = {}) {

@@ -1,0 +1,93 @@
+name: Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to upload assets to"
+        required: true
+        default: "v0.5.1"
+      upload_release:
+        description: "Upload built Windows installer to the GitHub Release"
+        required: true
+        default: "true"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows installer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri CLI
+        shell: pwsh
+        run: cargo install tauri-cli --version 2.11.3 --locked
+
+      - name: Verify JavaScript
+        shell: pwsh
+        run: node --check public/app.js
+
+      - name: Run tests
+        shell: pwsh
+        run: npm test
+
+      - name: Generate app assets
+        shell: pwsh
+        run: npm run app:assets
+
+      - name: Stage app resources
+        shell: pwsh
+        run: npm run app:stage-resources
+
+      - name: Packaging preflight
+        shell: pwsh
+        run: npm run app:preflight
+
+      - name: Build Windows installer
+        shell: pwsh
+        run: node src/tauriRunner.mjs build --bundles nsis
+
+      - name: Prepare release assets
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          $installer = Get-ChildItem "src-tauri/target/release/bundle/nsis" -Filter "*.exe" | Select-Object -First 1
+          if (-not $installer) {
+            throw "No NSIS installer was produced."
+          }
+          $target = "dist/Skills-Manager_0.5.1_x64-setup.exe"
+          Copy-Item $installer.FullName $target -Force
+          $hash = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $target" | Out-File -Encoding ascii "$target.sha256"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Skills-Manager-Windows
+          path: |
+            dist/Skills-Manager_0.5.1_x64-setup.exe
+            dist/Skills-Manager_0.5.1_x64-setup.exe.sha256
+
+      - name: Upload to GitHub Release
+        if: ${{ inputs.upload_release == 'true' }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ inputs.tag }}" `
+            "dist/Skills-Manager_0.5.1_x64-setup.exe" `
+            "dist/Skills-Manager_0.5.1_x64-setup.exe.sha256" `
+            --clobber
