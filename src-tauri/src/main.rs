@@ -28,6 +28,7 @@ fn main() {
             }
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![pick_agent_skill_folder])
         .on_window_event(|window, event| {
             if matches!(event, WindowEvent::CloseRequested { .. }) {
                 window.app_handle().exit(0);
@@ -35,6 +36,28 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running Skills Manager");
+}
+
+#[tauri::command]
+fn pick_agent_skill_folder() -> Result<Option<String>, String> {
+    let script = r#"POSIX path of (choose folder with prompt "Choose the Agent skills folder")"#;
+    let output = Command::new("osascript")
+        .arg("-e")
+        .arg(script)
+        .output()
+        .map_err(|error| format!("Could not open folder picker: {error}"))?;
+
+    if output.status.success() {
+        let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        return Ok((!path.is_empty()).then_some(path));
+    }
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    if stderr.contains("User canceled") || stderr.contains("-128") {
+        return Ok(None);
+    }
+
+    Err(stderr.trim().to_string())
 }
 
 struct ServiceProcess(Mutex<Child>);

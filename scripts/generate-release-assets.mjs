@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 
 const steps = [
   ["node", ["scripts/generate-app-icon.mjs", "src-tauri/icons/icon.png"]],
+  ["node", ["scripts/generate-app-icon.mjs", "public/app-icon.png"]],
   ["node", ["src/tauriRunner.mjs", "icon", "src-tauri/icons/icon.png"]],
   ["node", ["scripts/generate-dmg-background.mjs", "src-tauri/assets/dmg-background.png"]],
 ];

@@ -1,21 +1,33 @@
-import { deflateSync } from "node:zlib";
 import { writeFileSync } from "node:fs";
+import { deflateSync } from "node:zlib";
 
 const output = process.argv[2] ?? "src-tauri/icons/icon.png";
 const size = 1024;
-const scale = 2;
+const scale = 3;
 const width = size * scale;
 const height = size * scale;
 const pixels = new Uint8Array(width * height * 4);
 
-const colors = {
+const palette = {
   transparent: [0, 0, 0, 0],
-  mint: [225, 247, 243, 255],
-  mintLight: [239, 252, 249, 255],
-  teal: [15, 118, 110, 255],
-  tealDark: [17, 94, 89, 255],
-  border: [165, 223, 214, 255],
+  ink: [12, 34, 41, 255],
+  tealDeep: [10, 92, 88, 255],
+  teal: [18, 128, 118, 255],
+  mint: [154, 232, 213, 255],
+  mintSoft: [215, 252, 242, 255],
+  white: [255, 255, 255, 255],
+  line: [91, 209, 190, 255],
+  shadow: [0, 25, 30, 80],
 };
+
+function mix(a, b, t) {
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * t),
+    Math.round(a[1] + (b[1] - a[1]) * t),
+    Math.round(a[2] + (b[2] - a[2]) * t),
+    Math.round((a[3] ?? 255) + ((b[3] ?? 255) - (a[3] ?? 255)) * t),
+  ];
+}
 
 function setPixel(x, y, color) {
   if (x < 0 || y < 0 || x >= width || y >= height) return;
@@ -33,8 +45,8 @@ function blendPixel(x, y, color, alpha = 1) {
   const targetAlpha = pixels[index + 3] / 255;
   const outputAlpha = sourceAlpha + targetAlpha * (1 - sourceAlpha);
 
-  if (outputAlpha === 0) {
-    setPixel(x, y, colors.transparent);
+  if (outputAlpha <= 0) {
+    setPixel(x, y, palette.transparent);
     return;
   }
 
@@ -47,7 +59,7 @@ function blendPixel(x, y, color, alpha = 1) {
   pixels[index + 3] = Math.round(outputAlpha * 255);
 }
 
-function roundedRect(x, y, w, h, radius, color) {
+function roundedRect(x, y, w, h, radius, color, mode = "set") {
   const sx = Math.round(x * scale);
   const sy = Math.round(y * scale);
   const sw = Math.round(w * scale);
@@ -63,12 +75,73 @@ function roundedRect(x, y, w, h, radius, color) {
       const dx = px - cx;
       const dy = py - cy;
       if (dx * dx + dy * dy <= sr * sr) {
-        if (color[3] < 255) {
-          blendPixel(px, py, color);
-        } else {
-          setPixel(px, py, color);
-        }
+        if (mode === "blend" || color[3] < 255) blendPixel(px, py, color);
+        else setPixel(px, py, color);
       }
+    }
+  }
+}
+
+function roundedRectGradient(x, y, w, h, radius, top, bottom) {
+  const sx = Math.round(x * scale);
+  const sy = Math.round(y * scale);
+  const sw = Math.round(w * scale);
+  const sh = Math.round(h * scale);
+  const sr = Math.round(radius * scale);
+  const right = sx + sw;
+  const lower = sy + sh;
+
+  for (let py = sy; py < lower; py += 1) {
+    const t = Math.max(0, Math.min(1, (py - sy) / Math.max(1, sh - 1)));
+    const color = mix(top, bottom, t);
+    for (let px = sx; px < right; px += 1) {
+      const cx = px < sx + sr ? sx + sr : px >= right - sr ? right - sr - 1 : px;
+      const cy = py < sy + sr ? sy + sr : py >= lower - sr ? lower - sr - 1 : py;
+      const dx = px - cx;
+      const dy = py - cy;
+      if (dx * dx + dy * dy <= sr * sr) setPixel(px, py, color);
+    }
+  }
+}
+
+function circle(cx, cy, r, color, mode = "blend") {
+  const sx = Math.round(cx * scale);
+  const sy = Math.round(cy * scale);
+  const sr = Math.round(r * scale);
+  for (let py = sy - sr; py <= sy + sr; py += 1) {
+    for (let px = sx - sr; px <= sx + sr; px += 1) {
+      const dx = px - sx;
+      const dy = py - sy;
+      if (dx * dx + dy * dy <= sr * sr) {
+        if (mode === "set" && color[3] === 255) setPixel(px, py, color);
+        else blendPixel(px, py, color);
+      }
+    }
+  }
+}
+
+function capsuleLine(x1, y1, x2, y2, thickness, color) {
+  const sx1 = x1 * scale;
+  const sy1 = y1 * scale;
+  const sx2 = x2 * scale;
+  const sy2 = y2 * scale;
+  const r = (thickness * scale) / 2;
+  const minX = Math.floor(Math.min(sx1, sx2) - r);
+  const maxX = Math.ceil(Math.max(sx1, sx2) + r);
+  const minY = Math.floor(Math.min(sy1, sy2) - r);
+  const maxY = Math.ceil(Math.max(sy1, sy2) + r);
+  const dx = sx2 - sx1;
+  const dy = sy2 - sy1;
+  const lenSq = dx * dx + dy * dy || 1;
+
+  for (let py = minY; py <= maxY; py += 1) {
+    for (let px = minX; px <= maxX; px += 1) {
+      const t = Math.max(0, Math.min(1, ((px - sx1) * dx + (py - sy1) * dy) / lenSq));
+      const qx = sx1 + dx * t;
+      const qy = sy1 + dy * t;
+      const distX = px - qx;
+      const distY = py - qy;
+      if (distX * distX + distY * distY <= r * r) blendPixel(px, py, color);
     }
   }
 }
@@ -127,10 +200,7 @@ function encodePng(rgba) {
   for (let y = 0; y < size; y += 1) {
     const rowStart = y * (size * 4 + 1);
     raw[rowStart] = 0;
-    rgba.copy?.(raw, rowStart + 1, y * size * 4, (y + 1) * size * 4);
-    if (!rgba.copy) {
-      raw.set(rgba.subarray(y * size * 4, (y + 1) * size * 4), rowStart + 1);
-    }
+    raw.set(rgba.subarray(y * size * 4, (y + 1) * size * 4), rowStart + 1);
   }
 
   return Buffer.concat([
@@ -141,31 +211,37 @@ function encodePng(rgba) {
   ]);
 }
 
-roundedRect(64, 64, 896, 896, 196, colors.mint);
-roundedRect(84, 84, 856, 856, 172, colors.mintLight);
-roundedRect(108, 108, 808, 808, 146, colors.mint);
+roundedRect(116, 128, 792, 792, 182, palette.shadow, "blend");
+roundedRectGradient(74, 62, 876, 876, 212, [31, 160, 146, 255], palette.ink);
+roundedRect(94, 82, 836, 836, 188, [255, 255, 255, 24], "blend");
+roundedRect(132, 122, 760, 760, 158, [5, 42, 49, 70], "blend");
 
-for (let offset = 0; offset < 6; offset += 1) {
-  roundedRect(126 + offset, 126 + offset, 772 - offset * 2, 772 - offset * 2, 132, colors.border);
-}
-roundedRect(138, 138, 748, 748, 124, colors.mint);
+circle(512, 508, 326, [150, 242, 222, 18]);
+circle(512, 508, 244, [150, 242, 222, 16]);
 
-const bar = 76;
-const radius = 13;
+capsuleLine(294, 350, 422, 456, 20, [142, 245, 222, 145]);
+capsuleLine(730, 390, 604, 464, 20, [142, 245, 222, 145]);
+capsuleLine(512, 736, 512, 628, 20, [142, 245, 222, 145]);
 
-roundedRect(238, 292, 284, bar, radius, colors.teal);
-roundedRect(238, 292, bar, 256, radius, colors.teal);
-roundedRect(238, 474, 266, bar, radius, colors.teal);
-roundedRect(428, 474, bar, 256, radius, colors.teal);
-roundedRect(238, 656, 284, bar, radius, colors.teal);
+circle(294, 350, 38, [7, 55, 60, 230]);
+circle(294, 350, 18, palette.mintSoft);
+circle(730, 390, 38, [7, 55, 60, 230]);
+circle(730, 390, 18, palette.mintSoft);
+circle(512, 736, 38, [7, 55, 60, 230]);
+circle(512, 736, 18, palette.mintSoft);
 
-roundedRect(580, 292, bar, 440, radius, colors.tealDark);
-roundedRect(580, 292, 158, bar, radius, colors.tealDark);
-roundedRect(686, 398, bar, 334, radius, colors.tealDark);
-roundedRect(792, 292, bar, 440, radius, colors.tealDark);
-roundedRect(792, 292, bar, 164, radius, colors.tealDark);
+roundedRect(344, 356, 358, 244, 58, [5, 54, 61, 210], "blend");
+roundedRect(364, 374, 318, 204, 44, [30, 155, 142, 245], "blend");
+roundedRect(310, 426, 404, 244, 62, [2, 36, 43, 235], "blend");
+roundedRect(336, 450, 352, 190, 46, [235, 255, 249, 250], "blend");
 
-roundedRect(150, 150, 724, 724, 118, [255, 255, 255, 24]);
-roundedRect(220, 780, 584, 28, 14, [15, 118, 110, 40]);
+roundedRect(378, 488, 160, 24, 12, palette.teal);
+roundedRect(378, 536, 242, 24, 12, [28, 150, 137, 255]);
+roundedRect(378, 584, 112, 24, 12, [91, 209, 190, 255]);
+roundedRect(584, 482, 44, 44, 16, palette.teal);
+roundedRect(584, 568, 44, 44, 16, [91, 209, 190, 255]);
+
+roundedRect(252, 756, 520, 34, 17, [215, 252, 242, 48], "blend");
+roundedRect(300, 810, 424, 22, 11, [3, 29, 35, 80], "blend");
 
 writeFileSync(output, encodePng(downsample()));

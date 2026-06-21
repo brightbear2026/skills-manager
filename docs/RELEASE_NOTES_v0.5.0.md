@@ -4,6 +4,14 @@
 
 这是 Skills Manager 的首个公开测试版本。当前定位是本地 Agent Skills 控制台。
 
+### 2026-06-21 更新
+
+- 重做控制台信息架构，突出 Agent 和 skills 的关系、纳管状态、风险和复制目标。
+- 优化“全部 Skills / 已纳管 / 获取 / Agent 目录”的页面职责，减少重复说明。
+- 获取页在检查来源前隐藏右侧说明栏，检查后才显示结果面板。
+- 支持自定义 Agent 目录，并在复制 skill 时选择目标。
+- 更新应用图标和 DMG 背景。
+
 ### 下载
 
 - macOS Apple Silicon DMG: [Skills-Manager_0.5.0_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.0_aarch64.dmg)
@@ -28,6 +36,14 @@ API key 不会被打进 App 或 DMG。当前版本的 AI API key 会明文存储
 ## English
 
 This is the first public test build of Skills Manager. The current product scope is a local Agent Skills console.
+
+### 2026-06-21 Update
+
+- Redesigned the console information architecture around the relationship between agents and skills.
+- Clarified the role of All Skills, Managed Skills, Get Skills, and Agent Folders to reduce duplicated guidance.
+- The Get Skills page now hides the right-side guide before checking a source, then shows a result panel after the check.
+- Added custom Agent folder support and target selection when copying a skill.
+- Updated the app icon and DMG background.
 
 ### Download
 

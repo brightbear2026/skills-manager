@@ -1,16 +1,18 @@
 const TRANSLATIONS = {
   en: {
-    "app.tagline": "Discover, review, and copy local Agent Skills",
+    "app.tagline": "Manage and copy local Agent Skills",
     "app.language": "Language",
     "inspector.title": "Details",
     "inspector.reviewTitle": "Review panel",
     "inspector.distributeTitle": "Copy panel",
     "inspector.guideTitle": "Guide",
+    "inspector.resultTitle": "Result",
     "inspector.current": "Current selection",
     "inspector.localState": "Local State",
     "inspector.nextStep": "Next Step",
-    "inspector.setupTitle": "First-run status",
+    "inspector.setupTitle": "Local scan status",
     "inspector.importTitle": "Import flow",
+    "inspector.importResultTitle": "Check result",
     "inspector.runtimeTitle": "Run snapshot",
     "inspector.bridgeTitle": "Bridge status",
     "inspector.profilesTitle": "Agent folders",
@@ -19,19 +21,19 @@ const TRANSLATIONS = {
     "inspector.published": "Copied",
     "inspector.notInstalled": "Not installed",
     "inspector.stepScan": "Scan existing agent skill folders.",
-    "inspector.stepAdopt": "Add low-risk skills to the local library.",
+    "inspector.stepAdopt": "Save low-risk skills.",
     "inspector.stepReview": "Review high-risk skills one by one.",
     "inspector.stepFinish": "Finish setup without changing existing agent folders.",
     "inspector.stepPreview": "Preview the source before any install.",
-    "inspector.stepInstall": "Install into the local library only.",
-    "inspector.stepPublish": "Copy later from your library to a selected agent.",
-    "inspector.stepProfiles": "Check which agent folders can receive copied skills.",
-    "nav.setup": "Discover",
-    "nav.setupHint": "Find existing skills",
-    "nav.skills": "Review",
-    "nav.skillsHint": "Decide what enters the library",
-    "nav.library": "My Library",
-    "nav.libraryHint": "Ready to copy",
+    "inspector.stepInstall": "Save this skill before copying it.",
+    "inspector.stepPublish": "Copy later from Managed Skills to a selected agent.",
+    "inspector.stepProfiles": "Confirm the folders agents read from.",
+    "nav.setup": "Console",
+    "nav.setupHint": "Local agent skills overview",
+    "nav.skills": "All Skills",
+    "nav.skillsHint": "Scanned results and risk",
+    "nav.library": "Managed Skills",
+    "nav.libraryHint": "Managed, ready to copy",
     "nav.import": "Get Skills",
     "nav.importHint": "Folder, Git, or archive",
     "nav.advanced": "Advanced",
@@ -41,15 +43,15 @@ const TRANSLATIONS = {
     "nav.bridgeHint": "Optional handoff",
     "nav.profiles": "Agent Folders",
     "nav.profilesHint": "Where skills are copied",
-    "workspace.setup.kicker": "Discover",
-    "workspace.setup.title": "Local Skills Console",
-    "workspace.setup.subtitle": "Skills Manager finds skills already on this Mac, lets you review them, and keeps trusted ones ready to copy to agents.",
-    "workspace.skills.kicker": "Review",
-    "workspace.skills.title": "Found Skills",
-    "workspace.skills.subtitle": "These skills were found on this Mac. Review risk signals, then add trusted ones to your local library.",
-    "workspace.library.kicker": "Library",
-    "workspace.library.title": "My Library",
-    "workspace.library.subtitle": "Skills in this library are ready to copy to Claude, Codex, OpenClaw, or custom agent folders.",
+    "workspace.setup.kicker": "Console",
+    "workspace.setup.title": "Local Agent Skills Console",
+    "workspace.setup.subtitle": "See skills found across local agents, risk signals, managed skills, and copy targets in one place.",
+    "workspace.skills.kicker": "All Skills",
+    "workspace.skills.title": "All Agent Skills",
+    "workspace.skills.subtitle": "Scanned results from this Mac's agent skill folders. Review state and risk, then decide what should be managed.",
+    "workspace.library.kicker": "Managed Skills",
+    "workspace.library.title": "Managed Skills",
+    "workspace.library.subtitle": "These skills are saved by Skills Manager and can be copied to any enabled agent folder.",
     "workspace.import.kicker": "Get Skills",
     "workspace.import.title": "Get Skills",
     "workspace.import.subtitle": "Paste a local folder, Git repository URL, archive file, or GitHub owner/repo shortcut. Skills Manager checks the source before adding it.",
@@ -61,29 +63,62 @@ const TRANSLATIONS = {
     "workspace.bridge.subtitle": "Optional helper skill for agents that need to call back into Skills Manager.",
     "workspace.profiles.kicker": "Agent Folders",
     "workspace.profiles.title": "Agent Folders",
-    "workspace.profiles.subtitle": "Set the local folders each agent reads from. Choose the copy method when copying a specific skill.",
-    "home.valueTitle": "Local skills",
-    "home.valueBody": "Scan agent skill folders on this Mac, review what was found, add trusted skills to your library, then copy them when ready.",
-    "home.ctaManage": "Review skills",
+    "workspace.profiles.subtitle": "Set the local folders each agent reads from. Copy settings are chosen on each skill.",
     "home.ctaGet": "Get new skill",
     "home.ctaDistribute": "Copy to agent",
     "home.ctaAgents": "Agent folders",
     "home.discovered": "Discovered on this Mac",
-    "home.managed": "In your library",
+    "home.managed": "Managed",
     "home.review": "Need a decision",
     "home.agents": "Copy targets",
-    "home.nextTitle": "Next steps",
+    "home.nextTitle": "Recommended actions",
     "home.nextReviewTitle": "{count} need a decision",
     "home.nextReviewBody": "Allow or block high-risk skills before copying them to agents.",
-    "home.nextManageTitle": "{count} discovered",
-    "home.nextManageBody": "Review all skills found on this Mac.",
-    "home.nextLibraryTitle": "{count} in library",
-    "home.nextLibraryBody": "Open skills that are ready to copy to an agent.",
+    "home.nextManageTitle": "{count} total skills",
+    "home.nextManageBody": "Open the full scanned list from all local agent folders.",
+    "home.nextLibraryTitle": "{count} managed",
+    "home.nextLibraryBody": "Open skills already saved by Skills Manager.",
     "home.nextImportTitle": "Get a skill",
     "home.nextImportBody": "Paste a local folder, Git link, or archive and check it first.",
     "home.nextDistributionTitle": "{count} agent folder(s)",
     "home.nextDistributionBody": "Check where copied skills will be placed.",
     "home.statusTitle": "Status",
+    "home.metricAgents": "Agents",
+    "home.metricDiscovered": "Found locations",
+    "home.metricManaged": "Managed skills",
+    "home.metricNeedsAction": "Need attention",
+    "home.metricCopyGaps": "Copy gaps",
+    "home.agentMapTitle": "Agent distribution",
+    "home.skillMapTitle": "Skill distribution",
+    "home.actionsTitle": "Needs attention",
+    "home.columnAgent": "Agent",
+    "home.columnSkills": "Skills",
+    "home.columnManaged": "Managed",
+    "home.columnRisk": "Risk",
+    "home.columnUnique": "Unique",
+    "home.columnCopied": "Copied",
+    "home.columnFolder": "Folder",
+    "home.folderReady": "Ready",
+    "home.folderMissing": "Unavailable",
+    "home.noSkillsForAgent": "0",
+    "home.skillColumnSkill": "Skill",
+    "home.skillColumnAgents": "Available in agents",
+    "home.skillColumnState": "State",
+    "home.skillMore": "+{count} more",
+    "home.foundOnly": "Not managed",
+    "home.instanceCount": "{count} location(s)",
+    "home.copyGap": "Can copy to {count} more agent(s)",
+    "home.noCopyGap": "Already copied where needed",
+    "home.actionHighRisk": "{count} high-risk skill(s) need a copy decision",
+    "home.actionHighRiskBody": "Open All Skills and choose allow or block before copying.",
+    "home.actionCopyGaps": "{count} managed skill(s) are not copied anywhere",
+    "home.actionCopyGapsBody": "Open Managed Skills and copy important ones to agents.",
+    "home.actionMissingFolders": "{count} agent folder(s) are unavailable",
+    "home.actionMissingFoldersBody": "Open Agent Folders and fix the path before copying.",
+    "home.actionConflicts": "{count} duplicate/conflicting skill(s)",
+    "home.actionConflictsBody": "Open All Skills and compare the conflicting agent folders.",
+    "home.actionReady": "No urgent relationship issue",
+    "home.actionReadyBody": "The current agent folders, managed skills, and copy targets look clean.",
     "summary.skills": "Skills",
     "summary.roots": "Roots",
     "summary.conflicts": "Conflicts",
@@ -108,7 +143,7 @@ const TRANSLATIONS = {
     "sections.profiles": "Agent Folders",
     "actions.refresh": "Scan Mac",
     "actions.preview": "Check skill",
-    "actions.install": "Add to library",
+    "actions.install": "Save skill",
     "actions.finish": "Done",
     "actions.adoptLowRisk": "Add safe skills",
     "actions.adoptSelected": "Add selected ({count})",
@@ -122,9 +157,12 @@ const TRANSLATIONS = {
     "actions.installBridge": "Set up bridge",
     "actions.saveTrust": "Save decision",
     "actions.saveProfile": "Save settings",
+    "actions.addProfile": "Add folder",
+    "actions.deleteProfile": "Delete folder",
+    "actions.chooseFolder": "Choose folder",
     "actions.resetProfiles": "Restore default folders",
-    "actions.adoptIntoLibrary": "Add to library",
-    "actions.openInLibrary": "Open in library",
+    "actions.adoptIntoLibrary": "Save skill",
+    "actions.openInLibrary": "Open managed skill",
     "actions.startInvocation": "Test run",
     "actions.complete": "Complete",
     "filters.search": "Search skills, tools, paths",
@@ -137,12 +175,12 @@ const TRANSLATIONS = {
     "labels.source": "Source",
     "labels.status": "Status",
     "labels.fingerprint": "Fingerprint",
-    "labels.library": "Local library",
+    "labels.library": "Saved",
     "labels.path": "Path",
     "labels.updated": "Updated",
     "labels.files": "Files",
     "labels.version": "Version",
-    "labels.libraryPath": "Library path",
+    "labels.libraryPath": "Saved location",
     "labels.agent": "Agent name",
     "labels.publishToAgent": "Copy target",
     "labels.concurrency": "Concurrency",
@@ -156,6 +194,7 @@ const TRANSLATIONS = {
     "labels.reviewer": "Handled by",
     "labels.enabled": "Use this folder",
     "labels.skillRoot": "Skills folder",
+    "labels.profileName": "Agent name",
     "labels.adapter": "Agent type",
     "labels.resolvedCommit": "Resolved commit",
     "labels.diff": "Diff",
@@ -171,30 +210,30 @@ const TRANSLATIONS = {
     "status.promoted": " Promoted {count} queued run(s).",
     "status.runtimeFailed": "Runtime load failed: {status}",
     "status.scanFailed": "Scan failed: {status}",
-    "status.libraryFailed": "Library load failed: {status}",
+    "status.libraryFailed": "Saved skills failed to load: {status}",
     "status.firstRunFailed": "First-run load failed: {status}",
     "status.selectSkillToAdopt": "Select at least one existing skill to add.",
-    "status.adoptingLowRisk": "Adding low-risk existing skills...",
-    "status.adoptingSelected": "Adopting selected existing skills...",
-    "status.firstRunAdoptFailed": "Add failed: {status}",
-    "status.firstRunAdopted": "Added {adopted} existing skill(s). {skipped} skipped.",
+    "status.adoptingLowRisk": "Saving low-risk existing skills...",
+    "status.adoptingSelected": "Saving selected existing skills...",
+    "status.firstRunAdoptFailed": "Save failed: {status}",
+    "status.firstRunAdopted": "Saved {adopted} existing skill(s). {skipped} skipped.",
     "status.finishingFirstRun": "Finishing first-run import...",
     "status.finishFailed": "Finish failed: {status}",
     "status.firstRunFinished": "First-run import finished.",
-    "status.adoptingSkill": "Adding skill to the local library...",
+    "status.adoptingSkill": "Saving skill...",
     "status.adoptFailed": "Adopt failed: {status}",
-    "status.skillAdopted": "Skill added to the local library.",
+    "status.skillAdopted": "Skill saved.",
     "status.publishingSkill": "Copying skill to agent...",
     "status.publishFailed": "Copy failed: {status}",
     "status.publishedTo": "Copied to {profile}.",
-    "status.selectLibraryRecord": "Select a library record first.",
-    "status.publishingRecord": "Copying library skill to agent...",
+    "status.selectLibraryRecord": "Select a saved skill first.",
+    "status.publishingRecord": "Copying saved skill to agent...",
     "status.publishedRecord": "{record} copied to {profile}.",
     "status.savingMode": "Saving invocation mode...",
     "status.saveFailed": "Save failed: {status}",
     "status.modeSaved": "Invocation mode saved as {mode}.",
     "status.enterSource": "Enter a local folder, Git repository, or archive source first.",
-    "status.analyzeFirst": "Check this skill before adding it to your library.",
+    "status.analyzeFirst": "Check this skill before saving it.",
     "status.previewingSource": "Checking source...",
     "status.previewFailed": "Check failed: {status}",
     "status.previewed": "Checked {name}.",
@@ -204,34 +243,37 @@ const TRANSLATIONS = {
     "status.aiTestFailed": "Model connection failed: {status}",
     "status.aiIncomplete": "Add Base URL, model, and API key before testing.",
     "status.aiNotEnabled": "Enable AI interpretation before running it.",
-    "status.installingSource": "Adding source to the local library...",
+    "status.installingSource": "Saving source...",
     "status.installFailed": "Install failed: {status}",
-    "status.installedSource": "Added {name} to the local library.",
+    "status.installedSource": "Saved {name}.",
     "status.savingTrust": "Saving copy decision...",
     "status.trustSaved": "Copy decision saved as {status}.",
     "status.installingBridge": "Installing bridge skill...",
-    "status.bridgeInstalled": "Bridge skill added to the local library.",
+    "status.bridgeInstalled": "Bridge skill saved.",
     "status.savingProfile": "Saving profile...",
     "status.profileSaved": "Profile saved.",
+    "status.profileDeleted": "Agent folder deleted.",
+    "status.folderPickerUnavailable": "Folder picker is available in the Mac app. Paste the folder path here instead.",
+    "status.folderPickerFailed": "Folder picker failed: {status}",
     "status.republishingRecord": "Updating copy...",
     "status.unpublishingRecord": "Removing copy...",
     "status.recordUnpublished": "Removed copy from {profile}.",
     "setup.doneTitle": "Local console is ready",
-    "setup.doneBody": "Your Mac has been scanned. Review discovered skills, get new ones, or copy library skills to an agent.",
-    "firstRun.title": "Add existing skills to your library",
-    "firstRun.body": "Review skills already installed in agent folders, then add safe ones to your local library. Nothing is copied, overwritten, or deleted from here.",
+    "setup.doneBody": "Your Mac has been scanned. Use the console to review all local agent skills, manage trusted ones, and copy them to agents.",
+    "firstRun.title": "Save existing skills",
+    "firstRun.body": "Review skills already installed in agent folders, then save safe ones. Nothing is copied, overwritten, or deleted from here.",
     "firstRun.discovered": "Discovered",
-    "firstRun.ready": "Ready",
+    "firstRun.ready": "Ready to save",
     "firstRun.lowRisk": "Low risk",
     "firstRun.review": "Review",
     "firstRun.noSkills": "No existing skills were found in the scanned roots.",
     "firstRun.rootSummary": "{count} skill(s) / {ready} ready / {high} high risk",
     "firstRun.reviewIndividually": "review individually",
-    "library.emptyTitle": "Your library is empty",
+    "library.emptyTitle": "No saved skills yet",
     "library.emptyBody": "Get a skill from a local folder, Git repository, or archive, then copy it to an agent.",
     "library.publicationCount": "Copied to {count} agent(s)",
     "library.notPublished": "Not copied to any agent yet.",
-    "library.publishNote": "Click an agent to copy this library version into that agent's local skills folder.",
+    "library.publishNote": "Click an agent to copy this saved version into that agent's local skills folder.",
     "library.availableTargets": "Choose the target agent",
     "library.copyMethodTitle": "Copy method for this skill",
     "library.copyMethodHelp": "Safe copy is recommended. Plain copy and link are useful only when you know the target folder should mirror the source differently.",
@@ -246,9 +288,8 @@ const TRANSLATIONS = {
     "library.target.conflict": "Has existing skill",
     "library.target.managedOther": "Used by another record",
     "library.conflictHelp": "Skills Manager will not overwrite a user-owned skill folder. Remove or rename the existing folder first.",
-    "library.outdatedHelp": "The target copy does not match the current library version. Use Update copy.",
+    "library.outdatedHelp": "The target copy does not match the current saved version. Use Update copy.",
     "library.staleHelp": "This record says it was copied, but the target folder is missing. Copy it again or remove the stale record.",
-    "skills.scopeNote": "This list comes from scanning your Mac. Found only means the skill still lives only in an agent folder; In library means you added it to your local library; Copied means it is available in an agent.",
     "import.source": "Skill source",
     "import.sourcePlaceholder": "/path/to/skill, Git URL, .zip/.tar, or owner/repo",
     "import.ref": "Version or branch (optional)",
@@ -257,16 +298,18 @@ const TRANSLATIONS = {
     "import.subdirPlaceholder": "only needed when the skill is not at repo root",
     "import.advanced": "Optional settings, usually not needed",
     "import.advancedNote": "Most skills do not need these. Use them only when the source has multiple versions or folders.",
-    "import.replace": "Allow replacing a same-name skill in My Library",
+    "import.replace": "Allow replacing a same-name saved skill",
     "import.pin": "Lock to the checked commit",
     "import.historyTitle": "Recent sources",
     "import.historyBody": "Pick a recent source to check it again.",
     "import.historyEmpty": "Checked sources will appear here.",
     "import.historyClear": "Clear",
     "sourcePreview.analyzed": "Checked",
-    "sourcePreview.added": "Added",
+    "sourcePreview.added": "Saved",
     "sourcePreview.summaryTitle": "Source summary",
     "sourcePreview.localCheckTitle": "Local check",
+    "sourcePreview.sourcePath": "Source",
+    "sourcePreview.checkStats": "Checked content",
     "sourcePreview.aiTitle": "AI interpretation",
     "sourcePreview.aiUnavailable": "Not configured yet",
     "sourcePreview.aiBody": "AI can later summarize what this skill does, explain risky lines, and suggest whether to add or copy it. Local check results are still available without a model.",
@@ -307,24 +350,24 @@ const TRANSLATIONS = {
     "ai.keyMissing": "API key is not set.",
     "suggestion.title": "Suggestion",
     "suggestion.noPreview": "Paste a source, then check it here.",
-    "suggestion.safe": "Looks safe to add to your local library.",
+    "suggestion.safe": "Looks safe to save.",
     "suggestion.review": "Review the risk signals before adding or copying.",
     "suggestion.blocked": "Do not copy this to an agent until validation issues are resolved.",
-    "suggestion.addNext": "Next: add it to your local library, then copy it from My Library.",
+    "suggestion.addNext": "Next: save it, then copy it from Managed Skills.",
     "suggestion.inspectNext": "Next: inspect the findings in the preview before taking action.",
     "empty.selectSkillTitle": "Select a skill",
     "empty.selectSkillBody": "Review metadata, files, risk hints, and local path details.",
-    "empty.selectLibraryTitle": "Select a library skill",
+    "empty.selectLibraryTitle": "Select a saved skill",
     "empty.selectLibraryBody": "Choose a skill to see where it has been copied and copy it to an agent.",
-    "empty.setupTitle": "First-run workspace",
-    "empty.setupBody": "Add existing skills from the setup panel, then move to Review for details.",
+    "empty.setupTitle": "Local Agent Skills Console",
+    "empty.setupBody": "Scan all local agent skill folders, then review risk and decide what Skills Manager should manage.",
     "empty.importTitle": "Import workspace",
-    "empty.importBody": "Check a local folder, Git repository, or archive first, then add it to your local library.",
+    "empty.importBody": "Check a local folder, Git repository, or archive first, then save it.",
     "empty.runtimeTitle": "Runtime workspace",
     "empty.runtimeBody": "Runtime details appear here after you select a skill with invocation history.",
     "common.noDescription": "No description provided.",
     "common.noRiskFindings": "No risk findings",
-    "common.notInLibrary": "not in local library",
+    "common.notInLibrary": "not saved",
     "common.none": "(none)",
     "common.empty": "(empty)",
     "common.truncated": "Large instruction body truncated by the local API.",
@@ -344,6 +387,30 @@ const TRANSLATIONS = {
     "profiles.enabled": "Enabled",
     "profiles.none": "No agent folders are enabled.",
     "profiles.resetNote": "Reset restores Claude, Codex, and OpenClaw default skills folders.",
+    "profiles.addTitle": "Add an Agent folder",
+    "profiles.custom": "Custom",
+    "profiles.default": "Default",
+    "profiles.deleteConfirm": "Delete this custom Agent folder?",
+    "profiles.namePlaceholder": "My Agent",
+    "profiles.pathPlaceholder": "~/my-agent/skills",
+    "profiles.inspectorTitle": "What is this for?",
+    "profiles.inspectorBody": "These are not account connections. They only tell Skills Manager where to copy a skill when you choose an agent.",
+    "profiles.inspectorWhenTitle": "When it matters",
+    "profiles.inspectorWhenBody": "Agent folders are used only when copying one saved skill. Saving these folders does not scan, copy, overwrite, or delete existing skills.",
+    "profiles.listTitle": "Agent folders",
+    "profiles.listBody": "Enabled folders appear as copy targets when you copy a saved skill.",
+    "profiles.edit": "Edit",
+    "profiles.targetPreviewTitle": "Copy target preview",
+    "profiles.targetPreviewBody": "This is the list you will choose from when copying a saved skill to an agent.",
+    "profiles.enabledSummary": "{enabled}/{total} enabled",
+    "profiles.disabledSummary": "{count} disabled",
+    "profiles.readyTarget": "Will show as a copy target",
+    "profiles.disabledTarget": "Hidden when copying",
+    "profiles.noEnabledTargets": "No enabled copy targets yet.",
+    "profiles.targetNoteTitle": "What to check",
+    "profiles.targetNoteBody": "Keep the path as the folder that the agent itself reads for skills. Change it only when an agent uses a custom skills folder.",
+    "profiles.stepConfirmFolders": "Confirm each agent's skills folder.",
+    "profiles.stepCopySavedSkill": "Go to Managed Skills, choose one skill, then copy it to an agent.",
     "trust.unreviewed": "Not decided",
     "trust.trusted": "Allowed",
     "trust.reviewed": "Allowed",
@@ -356,14 +423,14 @@ const TRANSLATIONS = {
     "trust.currentReviewRequired": "High risk is not decided, so copying is stopped.",
     "trust.currentBlocked": "Blocked by you, so copying is stopped.",
     "governance.managed": "Copied",
-    "governance.adopted": "In library",
+    "governance.adopted": "Saved",
     "governance.unmanaged": "Found only",
-    "governance.library": "Local library",
+    "governance.library": "Managed",
     "governance.notPublished": "Not copied to an agent yet.",
     "governance.publishNote": "Copying creates a normal skill folder for the agent. If Skills Manager is removed later, that agent can still read the skill.",
-    "governance.manageOnlyNote": "Review is for risk and library decisions. Copying to agents happens from My Library.",
-    "governance.inLibraryNext": "This skill is already in My Library. Open it there to choose an agent.",
-    "governance.unmanagedNext": "Add this skill to My Library first. Then copy the library version to an agent.",
+    "governance.manageOnlyNote": "All Skills is for risk and management decisions. Copying to agents happens from Managed Skills.",
+    "governance.inLibraryNext": "This skill is already managed. Open it there to choose an agent.",
+    "governance.unmanagedNext": "Save this skill first. Then copy the managed version to an agent.",
     "invocation.note": "serialized locks this skill, singleton locks this skill name globally, keyed locks the resource key, and parallel does not lock.",
     "invocation.promptValue": "Simulate {name} invocation",
     "locks.none": "No active lock for this skill.",
@@ -397,17 +464,19 @@ const TRANSLATIONS = {
     "skills.noMatchesBody": "Try clearing filters or adding a skills root.",
   },
   zh: {
-    "app.tagline": "发现、审查、复制本地 Agent Skills",
+    "app.tagline": "管理和复制本地 Agent Skills",
     "app.language": "语言",
     "inspector.title": "详情",
     "inspector.reviewTitle": "审查面板",
     "inspector.distributeTitle": "复制面板",
     "inspector.guideTitle": "说明",
+    "inspector.resultTitle": "结果",
     "inspector.current": "当前选择",
     "inspector.localState": "本机状态",
     "inspector.nextStep": "下一步",
-    "inspector.setupTitle": "首次导入状态",
+    "inspector.setupTitle": "本机扫描状态",
     "inspector.importTitle": "导入流程",
+    "inspector.importResultTitle": "检查结果",
     "inspector.runtimeTitle": "运行快照",
     "inspector.bridgeTitle": "Bridge 状态",
     "inspector.profilesTitle": "Agent 目录",
@@ -416,19 +485,19 @@ const TRANSLATIONS = {
     "inspector.published": "已复制",
     "inspector.notInstalled": "未安装",
     "inspector.stepScan": "扫描已有 agent 原生 skill 根目录。",
-    "inspector.stepAdopt": "把低风险 skills 添加到本机库。",
+    "inspector.stepAdopt": "把低风险 skills 保存起来。",
     "inspector.stepReview": "逐个审查高风险 skills。",
     "inspector.stepFinish": "完成设置，同时保留 agent 原生可用性。",
     "inspector.stepPreview": "添加前先检查来源。",
-    "inspector.stepInstall": "只添加到本机库。",
-    "inspector.stepPublish": "之后从本机库复制到指定 agent。",
-    "inspector.stepProfiles": "检查哪些 Agent 目录可以接收 skills。",
-    "nav.setup": "发现",
-    "nav.setupHint": "自动找到已有 skills",
-    "nav.skills": "审查",
-    "nav.skillsHint": "决定哪些加入本机库",
-    "nav.library": "本机库",
-    "nav.libraryHint": "已添加，可复制",
+    "inspector.stepInstall": "先保存这个 skill。",
+    "inspector.stepPublish": "之后从已纳管 Skills 复制到指定 agent。",
+    "inspector.stepProfiles": "确认每个 Agent 从哪个文件夹读取 skills。",
+    "nav.setup": "控制台",
+    "nav.setupHint": "本机 Agent Skills 总览",
+    "nav.skills": "全部 Skills",
+    "nav.skillsHint": "扫描结果和风险",
+    "nav.library": "已纳管",
+    "nav.libraryHint": "已纳管，可复制",
     "nav.import": "获取",
     "nav.importHint": "文件夹 / Git / 压缩包",
     "nav.advanced": "高级",
@@ -438,18 +507,18 @@ const TRANSLATIONS = {
     "nav.bridgeHint": "可选 agent 回传",
     "nav.profiles": "Agent 目录",
     "nav.profilesHint": "复制到哪里",
-    "workspace.setup.kicker": "发现",
-    "workspace.setup.title": "本地 Skills 控制台",
-    "workspace.setup.subtitle": "Skills Manager 会自动发现这台 Mac 上已有的 skills，先让你审查，再把可信的放入本机库，准备好后复制给 agent。",
-    "workspace.skills.kicker": "审查",
-    "workspace.skills.title": "已发现 Skills",
-    "workspace.skills.subtitle": "这些是本机扫描发现的 skills。先看风险和状态，再把可信的加入本机库。",
-    "workspace.library.kicker": "本机库",
-    "workspace.library.title": "本机库",
-    "workspace.library.subtitle": "本机库里的 skills 可以复制到 Claude、Codex、OpenClaw 或自定义 Agent 目录。",
+    "workspace.setup.kicker": "控制台",
+    "workspace.setup.title": "本地 Agent Skills 控制台",
+    "workspace.setup.subtitle": "统一查看这台 Mac 上各个 Agent 的 skills、风险、已纳管内容和复制目标。",
+    "workspace.skills.kicker": "全部 Skills",
+    "workspace.skills.title": "全部 Agent Skills",
+    "workspace.skills.subtitle": "来自这台 Mac 上各个 Agent skills 文件夹的扫描结果。这里看状态和风险，决定哪些交给 Skills Manager 纳管。",
+    "workspace.library.kicker": "已纳管",
+    "workspace.library.title": "已纳管 Skills",
+    "workspace.library.subtitle": "这些 skills 已由 Skills Manager 纳管，可以复制到任意启用的 Agent 目录。",
     "workspace.import.kicker": "获取",
     "workspace.import.title": "获取 Skills",
-    "workspace.import.subtitle": "贴本地文件夹、Git 仓库链接、压缩包，或 GitHub owner/repo 快捷写法。Skills Manager 会先检查来源再添加。",
+    "workspace.import.subtitle": "贴本地文件夹、Git 仓库链接、压缩包，或 GitHub owner/repo 快捷写法。Skills Manager 会先检查来源再保存。",
     "workspace.runtime.kicker": "高级",
     "workspace.runtime.title": "运行记录",
     "workspace.runtime.subtitle": "查看可选的本地调用记录、锁和队列。",
@@ -459,28 +528,61 @@ const TRANSLATIONS = {
     "workspace.profiles.kicker": "Agent 目录",
     "workspace.profiles.title": "Agent 目录",
     "workspace.profiles.subtitle": "这里只设置每个 Agent 从哪个本机文件夹读取 skills。复制方式会在复制某个 skill 时选择。",
-    "home.valueTitle": "本机 Skills",
-    "home.valueBody": "扫描这台 Mac 上 agent 的 skills 文件夹，审查发现项，把可信的加入本机库，准备好后复制到 agent。",
-    "home.ctaManage": "审查 skills",
     "home.ctaGet": "获取新 skill",
     "home.ctaDistribute": "复制到 Agent",
     "home.ctaAgents": "Agent 目录",
     "home.discovered": "本机已发现",
-    "home.managed": "本机库",
+    "home.managed": "已纳管",
     "home.review": "需处理",
     "home.agents": "复制目标",
-    "home.nextTitle": "下一步",
+    "home.nextTitle": "建议处理",
     "home.nextReviewTitle": "{count} 个需处理",
     "home.nextReviewBody": "高风险 skill 复制到 Agent 前，需要选择允许或阻止。",
-    "home.nextManageTitle": "已发现 {count} 个",
-    "home.nextManageBody": "查看这台 Mac 上扫描到的全部 skills。",
-    "home.nextLibraryTitle": "本机库 {count} 个",
-    "home.nextLibraryBody": "查看已经可以复制到 Agent 的 skills。",
+    "home.nextManageTitle": "全部 {count} 个 Skills",
+    "home.nextManageBody": "查看从所有本机 Agent 目录扫描到的 skills。",
+    "home.nextLibraryTitle": "已纳管 {count} 个",
+    "home.nextLibraryBody": "查看已经由 Skills Manager 保存的 skills。",
     "home.nextImportTitle": "获取新 skill",
-    "home.nextImportBody": "贴本地文件夹、Git 链接或压缩包，先检查再添加。",
+    "home.nextImportBody": "贴本地文件夹、Git 链接或压缩包，先检查再保存。",
     "home.nextDistributionTitle": "{count} 个 Agent 目录",
     "home.nextDistributionBody": "确认复制 skill 时会放到哪些 Agent 目录。",
     "home.statusTitle": "当前状态",
+    "home.metricAgents": "Agent",
+    "home.metricDiscovered": "已发现位置",
+    "home.metricManaged": "已纳管",
+    "home.metricNeedsAction": "需处理",
+    "home.metricCopyGaps": "复制缺口",
+    "home.agentMapTitle": "Agent 分布",
+    "home.skillMapTitle": "Skill 分布",
+    "home.actionsTitle": "需要处理",
+    "home.columnAgent": "Agent",
+    "home.columnSkills": "Skills",
+    "home.columnManaged": "已纳管",
+    "home.columnRisk": "风险",
+    "home.columnUnique": "独有",
+    "home.columnCopied": "已复制",
+    "home.columnFolder": "目录",
+    "home.folderReady": "正常",
+    "home.folderMissing": "不可用",
+    "home.noSkillsForAgent": "0",
+    "home.skillColumnSkill": "Skill",
+    "home.skillColumnAgents": "在哪些 Agent 可用",
+    "home.skillColumnState": "风险 / 纳管",
+    "home.skillMore": "另有 {count} 个",
+    "home.foundOnly": "未纳管",
+    "home.instanceCount": "{count} 个位置",
+    "home.copyGap": "还可复制到 {count} 个 Agent",
+    "home.noCopyGap": "已覆盖需要的 Agent",
+    "home.actionHighRisk": "{count} 个高风险 skill 需要复制决定",
+    "home.actionHighRiskBody": "进入全部 Skills，先选择允许或阻止，再决定是否复制。",
+    "home.actionCopyGaps": "{count} 个已纳管 skill 还没复制到任何 Agent",
+    "home.actionCopyGapsBody": "进入已纳管 Skills，把常用 skill 复制到需要的 Agent。",
+    "home.actionMissingFolders": "{count} 个 Agent 目录不可用",
+    "home.actionMissingFoldersBody": "进入 Agent 目录，先修正路径，再复制 skill。",
+    "home.actionConflicts": "{count} 个同名或冲突 skill",
+    "home.actionConflictsBody": "进入全部 Skills，对比来自不同 Agent 目录的版本。",
+    "home.actionReady": "当前没有紧急关系问题",
+    "home.actionReadyBody": "Agent 目录、已纳管 Skills 和复制目标目前看起来正常。",
     "summary.skills": "Skills",
     "summary.roots": "根目录",
     "summary.conflicts": "冲突",
@@ -505,9 +607,9 @@ const TRANSLATIONS = {
     "sections.profiles": "Agent 目录",
     "actions.refresh": "扫描本机",
     "actions.preview": "检查这个 skill",
-    "actions.install": "添加到本机库",
+    "actions.install": "保存 skill",
     "actions.finish": "完成",
-    "actions.adoptLowRisk": "添加安全项",
+    "actions.adoptLowRisk": "保存安全项",
     "actions.adoptSelected": "添加已选（{count}）",
     "actions.saveMode": "保存",
     "actions.publishManagedMirror": "复制到 Agent",
@@ -519,9 +621,12 @@ const TRANSLATIONS = {
     "actions.installBridge": "设置桥接",
     "actions.saveTrust": "保存决定",
     "actions.saveProfile": "保存设置",
+    "actions.addProfile": "添加目录",
+    "actions.deleteProfile": "删除目录",
+    "actions.chooseFolder": "选择文件夹",
     "actions.resetProfiles": "恢复默认目录",
-    "actions.adoptIntoLibrary": "添加到本机库",
-    "actions.openInLibrary": "去本机库复制",
+    "actions.adoptIntoLibrary": "保存 skill",
+    "actions.openInLibrary": "去已纳管复制",
     "actions.startInvocation": "测试运行",
     "actions.complete": "完成",
     "filters.search": "搜索 skill、工具、路径",
@@ -534,12 +639,12 @@ const TRANSLATIONS = {
     "labels.source": "来源",
     "labels.status": "状态",
     "labels.fingerprint": "指纹",
-    "labels.library": "本机库",
+    "labels.library": "保存状态",
     "labels.path": "路径",
     "labels.updated": "更新时间",
     "labels.files": "文件",
     "labels.version": "版本",
-    "labels.libraryPath": "本机库路径",
+    "labels.libraryPath": "保存位置",
     "labels.agent": "Agent 名称",
     "labels.publishToAgent": "复制目标",
     "labels.concurrency": "并发策略",
@@ -553,6 +658,7 @@ const TRANSLATIONS = {
     "labels.reviewer": "处理人",
     "labels.enabled": "使用这个目录",
     "labels.skillRoot": "Skills 文件夹",
+    "labels.profileName": "Agent 名称",
     "labels.adapter": "Agent 类型",
     "labels.resolvedCommit": "解析 commit",
     "labels.diff": "差异",
@@ -568,30 +674,30 @@ const TRANSLATIONS = {
     "status.promoted": " 已推进 {count} 个排队调用。",
     "status.runtimeFailed": "运行时加载失败：{status}",
     "status.scanFailed": "扫描失败：{status}",
-    "status.libraryFailed": "本机库加载失败：{status}",
+    "status.libraryFailed": "已纳管 Skills 加载失败：{status}",
     "status.firstRunFailed": "首次导入加载失败：{status}",
-    "status.selectSkillToAdopt": "请至少选择一个要添加到本机库的已有 skill。",
-    "status.adoptingLowRisk": "正在添加低风险已有 skills...",
-    "status.adoptingSelected": "正在添加已选择的已有 skills...",
-    "status.firstRunAdoptFailed": "添加失败：{status}",
-    "status.firstRunAdopted": "已添加 {adopted} 个已有 skill，跳过 {skipped} 个。",
+    "status.selectSkillToAdopt": "请至少选择一个要保存的已有 skill。",
+    "status.adoptingLowRisk": "正在保存低风险已有 skills...",
+    "status.adoptingSelected": "正在保存已选择的已有 skills...",
+    "status.firstRunAdoptFailed": "保存失败：{status}",
+    "status.firstRunAdopted": "已保存 {adopted} 个已有 skill，跳过 {skipped} 个。",
     "status.finishingFirstRun": "正在完成首次导入...",
     "status.finishFailed": "完成失败：{status}",
     "status.firstRunFinished": "首次导入已完成。",
-    "status.adoptingSkill": "正在添加到本机库...",
-    "status.adoptFailed": "添加失败：{status}",
-    "status.skillAdopted": "Skill 已添加到本机库。",
+    "status.adoptingSkill": "正在保存 skill...",
+    "status.adoptFailed": "保存失败：{status}",
+    "status.skillAdopted": "Skill 已保存。",
     "status.publishingSkill": "正在复制到 agent...",
     "status.publishFailed": "复制失败：{status}",
     "status.publishedTo": "已复制到 {profile}。",
-    "status.selectLibraryRecord": "请先选择一个本机库 skill。",
-    "status.publishingRecord": "正在把本机库 skill 复制到 agent...",
+    "status.selectLibraryRecord": "请先选择一个已保存 skill。",
+    "status.publishingRecord": "正在把已保存 skill 复制到 agent...",
     "status.publishedRecord": "{record} 已复制到 {profile}。",
     "status.savingMode": "正在保存调用模式...",
     "status.saveFailed": "保存失败：{status}",
     "status.modeSaved": "调用模式已保存为 {mode}。",
     "status.enterSource": "请先输入本地文件夹、Git 仓库或压缩包来源。",
-    "status.analyzeFirst": "先检查这个 skill，再添加到本机库。",
+    "status.analyzeFirst": "先检查这个 skill，再保存。",
     "status.previewingSource": "正在检查来源...",
     "status.previewFailed": "检查失败：{status}",
     "status.previewed": "已检查 {name}。",
@@ -601,34 +707,37 @@ const TRANSLATIONS = {
     "status.aiTestFailed": "模型连接失败：{status}",
     "status.aiIncomplete": "请先填写 Base URL、模型和 API Key。",
     "status.aiNotEnabled": "请先启用 AI 解读。",
-    "status.installingSource": "正在添加到本机库...",
+    "status.installingSource": "正在保存 skill...",
     "status.installFailed": "安装失败：{status}",
-    "status.installedSource": "已将 {name} 添加到本机库。",
+    "status.installedSource": "已保存 {name}。",
     "status.savingTrust": "正在保存复制决定...",
     "status.trustSaved": "复制决定已保存为 {status}。",
     "status.installingBridge": "正在安装 bridge skill...",
-    "status.bridgeInstalled": "Bridge skill 已添加到本机库。",
+    "status.bridgeInstalled": "Bridge skill 已保存。",
     "status.savingProfile": "正在保存 Agent 目录...",
     "status.profileSaved": "Agent 目录已保存。",
+    "status.profileDeleted": "Agent 目录已删除。",
+    "status.folderPickerUnavailable": "选择文件夹仅在 Mac App 中可用。当前可以直接粘贴文件夹路径。",
+    "status.folderPickerFailed": "选择文件夹失败：{status}",
     "status.republishingRecord": "正在更新副本...",
     "status.unpublishingRecord": "正在移除副本...",
     "status.recordUnpublished": "已从 {profile} 移除副本。",
     "setup.doneTitle": "本地控制台已就绪",
-    "setup.doneBody": "这台 Mac 已完成扫描。你可以审查已发现的 skills、获取新的 skill，或把本机库里的 skill 复制到 agent。",
-    "firstRun.title": "把已有 skills 添加到本机库",
-    "firstRun.body": "先审查 agent 目录里已有的 skills，再把安全项添加到本机库。这里不会复制、覆盖或删除任何原目录内容。",
+    "setup.doneBody": "这台 Mac 已完成扫描。你可以在控制台查看全部本机 Agent Skills、处理风险、纳管可信 skills，并复制到 Agent。",
+    "firstRun.title": "保存已有 skills",
+    "firstRun.body": "先审查 agent 目录里已有的 skills，再把安全项保存起来。这里不会复制、覆盖或删除任何原目录内容。",
     "firstRun.discovered": "已发现",
-    "firstRun.ready": "可添加",
+    "firstRun.ready": "可保存",
     "firstRun.lowRisk": "低风险",
     "firstRun.review": "需审查",
     "firstRun.noSkills": "扫描根目录中没有发现已有 skills。",
-    "firstRun.rootSummary": "{count} 个 skill / {ready} 个可添加 / {high} 个高风险",
+    "firstRun.rootSummary": "{count} 个 skill / {ready} 个可保存 / {high} 个高风险",
     "firstRun.reviewIndividually": "逐个审查",
-    "library.emptyTitle": "本机库还是空的",
+    "library.emptyTitle": "还没有保存的 Skills",
     "library.emptyBody": "先从本地文件夹、Git 仓库或压缩包获取一个 skill，然后再复制到 agent。",
     "library.publicationCount": "已复制到 {count} 个 agent",
     "library.notPublished": "尚未复制到任何 agent。",
-    "library.publishNote": "点击某个 Agent，就会把本机库里的版本复制到它的本地 skills 文件夹。",
+    "library.publishNote": "点击某个 Agent，就会把已保存版本复制到它的本地 skills 文件夹。",
     "library.availableTargets": "选择要复制到的 Agent",
     "library.copyMethodTitle": "这个 skill 的复制方式",
     "library.copyMethodHelp": "建议保持安全副本。普通复制和链接到原目录只适合你明确知道目标目录需要用另一种写入方式时。",
@@ -643,9 +752,8 @@ const TRANSLATIONS = {
     "library.target.conflict": "已有 skill",
     "library.target.managedOther": "被其他记录占用",
     "library.conflictHelp": "Skills Manager 不会覆盖用户自己的 skill 文件夹。请先移除或重命名已有文件夹。",
-    "library.outdatedHelp": "目标副本和当前本机库版本不一致。可以点击更新副本。",
+    "library.outdatedHelp": "目标副本和当前保存版本不一致。可以点击更新副本。",
     "library.staleHelp": "记录显示曾经复制过，但目标文件夹已不存在。可以重新复制或移除这条记录。",
-    "skills.scopeNote": "这里是扫描本机后发现的全部 skills。仅发现表示它还只在 agent 文件夹里；本机库表示已添加到本机库；已复制表示已在某个 agent 可用。",
     "import.source": "Skill 来源",
     "import.sourcePlaceholder": "本地文件夹、Git 链接、.zip/.tar，或 owner/repo",
     "import.ref": "版本或分支（可不填）",
@@ -654,19 +762,21 @@ const TRANSLATIONS = {
     "import.subdirPlaceholder": "skill 不在仓库根目录时才需要填",
     "import.advanced": "可选设置，一般不用填",
     "import.advancedNote": "大多数 skills 不需要这些设置。只有来源包含多个版本或多个文件夹时，才需要手动指定。",
-    "import.replace": "允许替换本机库里的同名 skill",
+    "import.replace": "允许替换已保存的同名 skill",
     "import.pin": "固定到本次检查到的 commit",
     "import.historyTitle": "最近来源",
     "import.historyBody": "选择一个最近来源，可以再次检查。",
     "import.historyEmpty": "检查过的来源会显示在这里。",
     "import.historyClear": "清空",
     "sourcePreview.analyzed": "已检查",
-    "sourcePreview.added": "已添加",
+    "sourcePreview.added": "已保存",
     "sourcePreview.summaryTitle": "来源摘要",
     "sourcePreview.localCheckTitle": "本地检查",
+    "sourcePreview.sourcePath": "来源",
+    "sourcePreview.checkStats": "检查内容",
     "sourcePreview.aiTitle": "AI 解读",
     "sourcePreview.aiUnavailable": "尚未配置",
-    "sourcePreview.aiBody": "后续可用 AI 总结这个 skill 做什么、解释风险位置，并建议是否加入或复制。没有模型时，本地检查仍可离线使用。",
+    "sourcePreview.aiBody": "后续可用 AI 总结这个 skill 做什么、解释风险位置，并建议是否保存或复制。没有模型时，本地检查仍可离线使用。",
     "sourcePreview.aiNext": "下一步：添加模型设置后，按需运行 AI 解读。",
     "sourcePreview.aiReady": "已配置",
     "sourcePreview.aiRun": "运行 AI 解读",
@@ -704,24 +814,24 @@ const TRANSLATIONS = {
     "ai.keyMissing": "API Key 未设置。",
     "suggestion.title": "建议",
     "suggestion.noPreview": "贴上来源后，在这里检查。",
-    "suggestion.safe": "看起来可以添加到本机库。",
-    "suggestion.review": "添加或复制前建议先审查风险项。",
+    "suggestion.safe": "看起来可以保存。",
+    "suggestion.review": "保存或复制前建议先审查风险项。",
     "suggestion.blocked": "校验问题解决前，不建议复制这个 skill。",
-    "suggestion.addNext": "下一步：先添加到本机库，再从本机库复制到 Agent。",
+    "suggestion.addNext": "下一步：先保存，再从已纳管 Skills 复制到 Agent。",
     "suggestion.inspectNext": "下一步：先查看预览里的风险和校验结果。",
     "empty.selectSkillTitle": "选择一个 skill",
     "empty.selectSkillBody": "查看元数据、文件、风险提示和本地路径。",
-    "empty.selectLibraryTitle": "选择一个本机库 skill",
+    "empty.selectLibraryTitle": "选择一个已保存 skill",
     "empty.selectLibraryBody": "查看它已复制到哪些 agent，并继续复制到指定 agent。",
-    "empty.setupTitle": "首次设置工作区",
-    "empty.setupBody": "在中间面板把已有 skills 添加到本机库，然后进入审查页做详细审查。",
+    "empty.setupTitle": "本地 Agent Skills 控制台",
+    "empty.setupBody": "扫描所有本机 Agent skills 文件夹后，在这里查看总览、风险和后续处理建议。",
     "empty.importTitle": "导入工作区",
-    "empty.importBody": "先检查本地文件夹、Git 仓库或压缩包，再添加到本机库。",
+    "empty.importBody": "先检查本地文件夹、Git 仓库或压缩包，再保存。",
     "empty.runtimeTitle": "运行协调工作区",
     "empty.runtimeBody": "选择有调用历史的 skill 后，这里会显示运行细节。",
     "common.noDescription": "暂无描述。",
     "common.noRiskFindings": "没有风险发现",
-    "common.notInLibrary": "不在本机库",
+    "common.notInLibrary": "未保存",
     "common.none": "（无）",
     "common.empty": "（空）",
     "common.truncated": "指令内容较大，已由本地 API 截断。",
@@ -741,6 +851,30 @@ const TRANSLATIONS = {
     "profiles.enabled": "已启用",
     "profiles.none": "还没有启用的 Agent 目录。",
     "profiles.resetNote": "重置会恢复 Claude、Codex 和 OpenClaw 的默认 skills 文件夹。",
+    "profiles.addTitle": "添加 Agent 目录",
+    "profiles.custom": "自定义",
+    "profiles.default": "默认",
+    "profiles.deleteConfirm": "删除这个自定义 Agent 目录？",
+    "profiles.namePlaceholder": "我的 Agent",
+    "profiles.pathPlaceholder": "~/my-agent/skills",
+    "profiles.inspectorTitle": "这里用来做什么？",
+    "profiles.inspectorBody": "这里不是账号连接。它只告诉 Skills Manager：复制某个 skill 时，应该写入哪些本机文件夹。",
+    "profiles.inspectorWhenTitle": "什么时候会用到？",
+    "profiles.inspectorWhenBody": "只有从已纳管 Skills 复制某个 skill 时，才会用到这些目录。保存目录不会扫描、复制、覆盖或删除已有 skills。",
+    "profiles.listTitle": "Agent 目录",
+    "profiles.listBody": "已启用的目录会在复制 skill 时作为目标出现。",
+    "profiles.edit": "编辑",
+    "profiles.targetPreviewTitle": "复制目标预览",
+    "profiles.targetPreviewBody": "这里显示复制已保存 skill 时，用户真正会选择的 Agent 目标。",
+    "profiles.enabledSummary": "{enabled}/{total} 已启用",
+    "profiles.disabledSummary": "{count} 个已禁用",
+    "profiles.readyTarget": "复制时会出现",
+    "profiles.disabledTarget": "复制时隐藏",
+    "profiles.noEnabledTargets": "还没有启用的复制目标。",
+    "profiles.targetNoteTitle": "需要确认什么",
+    "profiles.targetNoteBody": "路径应保持为该 Agent 自己读取 skills 的文件夹。只有 Agent 使用自定义 skills 文件夹时才需要修改。",
+    "profiles.stepConfirmFolders": "确认每个 Agent 的 skills 文件夹。",
+    "profiles.stepCopySavedSkill": "进入已纳管 Skills，选择一个 skill，再复制到目标 Agent。",
     "trust.unreviewed": "未决定",
     "trust.trusted": "允许复制",
     "trust.reviewed": "允许复制",
@@ -753,14 +887,14 @@ const TRANSLATIONS = {
     "trust.currentReviewRequired": "高风险尚未处理，暂不能复制。",
     "trust.currentBlocked": "已被你阻止，不能复制。",
     "governance.managed": "已复制",
-    "governance.adopted": "本机库",
-    "governance.unmanaged": "仅发现",
-    "governance.library": "本机库",
+    "governance.adopted": "已纳管",
+    "governance.unmanaged": "未纳管",
+    "governance.library": "已纳管",
     "governance.notPublished": "尚未复制到任何 agent。",
     "governance.publishNote": "复制会创建 agent 原生 skill 目录。即使之后移除 Skills Manager，该 agent 仍可读取此 skill。",
-    "governance.manageOnlyNote": "审查页只负责风险和是否加入本机库；复制到 agent 请在本机库完成。",
-    "governance.inLibraryNext": "这个 skill 已在本机库。进入本机库后选择 Agent。",
-    "governance.unmanagedNext": "先把这个 skill 加入本机库，再从本机库复制到 Agent。",
+    "governance.manageOnlyNote": "全部 Skills 负责查看风险和决定是否纳管；复制到 Agent 请在已纳管 Skills 完成。",
+    "governance.inLibraryNext": "这个 skill 已纳管。进入已纳管 Skills 后选择 Agent。",
+    "governance.unmanagedNext": "先保存这个 skill，再从已纳管 Skills 复制到 Agent。",
     "invocation.note": "serialized 锁定当前 skill，singleton 按 skill 名全局锁定，keyed 锁定资源键，parallel 不加锁。",
     "invocation.promptValue": "模拟调用 {name}",
     "locks.none": "此 skill 当前没有活跃锁。",
@@ -984,9 +1118,18 @@ elements.bridgePanel?.addEventListener("click", async (event) => {
 });
 
 elements.profilesPanel?.addEventListener("submit", async (event) => {
-  if (!(event.target instanceof HTMLFormElement) || !event.target.matches("[data-profile-form]")) return;
+  if (!(event.target instanceof HTMLFormElement)) return;
   event.preventDefault();
   const formData = new FormData(event.target);
+  if (event.target.matches("[data-profile-create]")) {
+    await createProfile({
+      name: formData.get("name"),
+      skillRoot: formData.get("skillRoot"),
+      enabled: true,
+    });
+    return;
+  }
+  if (!event.target.matches("[data-profile-form]")) return;
   await saveProfile(event.target.getAttribute("data-profile-form"), {
     name: formData.get("name"),
     skillRoot: formData.get("skillRoot"),
@@ -998,6 +1141,18 @@ elements.profilesPanel?.addEventListener("click", async (event) => {
   if (!(event.target instanceof Element)) return;
   if (event.target.closest("[data-reset-profiles]")) {
     await resetProfileSettings();
+  }
+  const folderButton = event.target.closest("[data-pick-skill-root]");
+  if (folderButton) {
+    await pickSkillRoot(folderButton);
+    return;
+  }
+  const deleteButton = event.target.closest("[data-delete-profile]");
+  if (deleteButton) {
+    const profileId = deleteButton.getAttribute("data-delete-profile");
+    if (profileId && window.confirm(t("profiles.deleteConfirm"))) {
+      await deleteProfile(profileId);
+    }
   }
 });
 
@@ -1254,8 +1409,7 @@ function setView(view, options = {}) {
 }
 
 function renderWorkspace() {
-  elements.shell.classList.remove("detail-hidden");
-  elements.detailPane?.classList.remove("hidden");
+  syncDetailPaneVisibility();
   elements.refreshButton?.classList.toggle("hidden", state.view !== "setup");
   for (const button of elements.viewButtons) {
     button.classList.toggle("active", button.getAttribute("data-view") === state.view);
@@ -1280,6 +1434,16 @@ function renderWorkspace() {
   syncImportActions();
   renderBridgePanel();
   renderProfilesPanel();
+}
+
+function shouldHideDetailPane() {
+  return state.view === "setup" || (state.view === "import" && !state.sourcePreview);
+}
+
+function syncDetailPaneVisibility() {
+  const hideDetailPane = shouldHideDetailPane();
+  elements.shell.classList.toggle("detail-hidden", hideDetailPane);
+  elements.detailPane?.classList.toggle("hidden", hideDetailPane);
 }
 
 function t(key, variables = {}) {
@@ -1445,37 +1609,97 @@ function renderBridgePanel() {
 function renderProfilesPanel() {
   if (!elements.profilesPanel) return;
   const profiles = state.profiles?.profiles || state.runtime?.profiles || [];
+  const enabled = profiles.filter((profile) => profile.enabled !== false);
   elements.profilesPanel.innerHTML = `
+    <div class="profiles-overview">
+      <div>
+        <strong>${t("profiles.listTitle")}</strong>
+        <span>${t("profiles.listBody")}</span>
+      </div>
+      <span class="badge ${enabled.length ? "low" : "medium"}">${t("profiles.enabledSummary", { enabled: enabled.length, total: profiles.length })}</span>
+    </div>
+    <details class="profile-add-card">
+      <summary>
+        <div>
+          <strong>${t("profiles.addTitle")}</strong>
+          <small>${t("profiles.custom")}</small>
+        </div>
+        <span class="secondary-button">${t("actions.addProfile")}</span>
+      </summary>
+      <form class="profile-create-form" data-profile-create>
+        <div class="profile-fields-grid">
+          <label>
+            ${t("labels.profileName")}
+            <input name="name" placeholder="${escapeHtml(t("profiles.namePlaceholder"))}" required />
+          </label>
+          ${renderSkillRootField("", t("profiles.pathPlaceholder"))}
+        </div>
+        <button type="submit">${t("actions.addProfile")}</button>
+      </form>
+    </details>
+    <div class="profile-list">
+      ${profiles.map((profile) => renderProfileForm(profile)).join("")}
+    </div>
     <div class="profiles-actions">
       <button type="button" class="secondary-button" data-reset-profiles>${t("actions.resetProfiles")}</button>
       <span>${t("profiles.resetNote")}</span>
-    </div>
-    <div class="profile-list">
-      ${profiles.map((profile) => renderProfileForm(profile)).join("")}
     </div>
   `;
 }
 
 function renderProfileForm(profile) {
+  const typeLabel = profile.canDelete ? t("profiles.custom") : t("profiles.default");
+  const statusLabel = profile.enabled ? t("profiles.enabled") : t("profiles.disabled");
   return `
     <form class="profile-card profile-card-simple" data-profile-form="${escapeHtml(profile.id)}">
-      <div class="profile-card-head">
-        <div>
+      <div class="profile-summary-row">
+        <span class="profile-summary-main">
           <strong>${escapeHtml(profile.name)}</strong>
-          <small>${escapeHtml(profile.adapter || "custom")}</small>
-        </div>
-        <label class="profile-enable-toggle">
-          <input type="checkbox" name="enabled" ${profile.enabled ? "checked" : ""} />
-          <span>${escapeHtml(profile.enabled ? t("profiles.enabled") : t("profiles.disabled"))}</span>
-        </label>
+          <small>${escapeHtml(profile.skillRoot)}</small>
+        </span>
+        <span class="profile-summary-meta">
+          <span class="badge neutral">${escapeHtml(typeLabel)}</span>
+          <span class="badge ${profile.enabled ? "low" : "neutral"}">${escapeHtml(statusLabel)}</span>
+        </span>
       </div>
-      <input type="hidden" name="name" value="${escapeHtml(profile.name)}" />
-      <label>
-        ${t("labels.skillRoot")}
-        <input name="skillRoot" value="${escapeHtml(profile.skillRoot)}" />
-      </label>
-      <button type="submit">${t("actions.saveProfile")}</button>
+      <details class="profile-edit-details">
+        <summary>${t("profiles.edit")}</summary>
+        <div class="profile-edit-grid">
+          <label>
+            ${t("labels.profileName")}
+            <input name="name" value="${escapeHtml(profile.name)}" />
+          </label>
+          ${renderSkillRootField(profile.skillRoot)}
+          <label class="profile-enable-toggle">
+            <input type="checkbox" name="enabled" ${profile.enabled ? "checked" : ""} />
+            <span>${escapeHtml(statusLabel)}</span>
+          </label>
+          <div class="profile-card-actions">
+            <button type="submit">${t("actions.saveProfile")}</button>
+            ${
+              profile.canDelete
+                ? `<button type="button" class="secondary-button danger-button" data-delete-profile="${escapeHtml(profile.id)}">${t("actions.deleteProfile")}</button>`
+                : ""
+            }
+          </div>
+        </div>
+      </details>
     </form>
+  `;
+}
+
+function renderSkillRootField(value = "", placeholder = "") {
+  const picker = isTauriApp()
+    ? `<button type="button" class="secondary-button folder-picker-button" data-pick-skill-root>${t("actions.chooseFolder")}</button>`
+    : "";
+  return `
+    <label class="profile-field">
+      <span>${t("labels.skillRoot")}</span>
+      <span class="input-with-action">
+        <input name="skillRoot" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" required />
+        ${picker}
+      </span>
+    </label>
   `;
 }
 
@@ -1553,70 +1777,373 @@ function renderFirstRunImport() {
 
 function renderHomeOverview() {
   if (!elements.firstRunDone) return;
-  const skills = state.catalog?.counts?.skills || 0;
-  const highRisk = state.catalog?.counts?.highRisk || 0;
-  const records = state.library?.counts?.records || 0;
-  const profiles = state.profiles?.profiles || state.runtime?.profiles || [];
-  const enabledProfiles = profiles.filter((profile) => profile.enabled !== false).length;
+  const relationship = buildHomeRelationship();
 
   elements.firstRunDone.className = "home-overview";
   elements.firstRunDone.innerHTML = `
-    <section class="home-hero">
-      <div>
-        <h3>${t("home.valueTitle")}</h3>
-        <p>${t("home.valueBody")}</p>
-      </div>
-      <button type="button" data-home-view="skills">${t("home.ctaManage")}</button>
-    </section>
-
-    <section class="home-next">
-      <h3>${t("home.nextTitle")}</h3>
-      <div class="next-action-list">
-        <button type="button" class="next-action ${highRisk > 0 ? "is-primary" : ""}" data-home-view="skills">
-          <strong>${t("home.nextReviewTitle", { count: highRisk })}</strong>
-          <span>${t("home.nextReviewBody")}</span>
+    <section class="relationship-hero">
+      <div class="relationship-metrics">
+        <button type="button" data-home-view="profiles">
+          <strong>${relationship.enabledProfiles}</strong>
+          <span>${t("home.metricAgents")}</span>
         </button>
-        <button type="button" class="next-action" data-home-view="skills">
-          <strong>${t("home.nextManageTitle", { count: skills })}</strong>
-          <span>${t("home.nextManageBody")}</span>
-        </button>
-        <button type="button" class="next-action" data-home-view="library">
-          <strong>${t("home.nextLibraryTitle", { count: records })}</strong>
-          <span>${t("home.nextLibraryBody")}</span>
-        </button>
-        <button type="button" class="next-action" data-home-view="import">
-          <strong>${t("home.nextImportTitle")}</strong>
-          <span>${t("home.nextImportBody")}</span>
-        </button>
-        <button type="button" class="next-action" data-home-view="profiles">
-          <strong>${t("home.nextDistributionTitle", { count: enabledProfiles })}</strong>
-          <span>${t("home.nextDistributionBody")}</span>
-        </button>
-      </div>
-    </section>
-
-    <section class="home-status">
-      <strong>${t("home.statusTitle")}</strong>
-      <div class="status-strip">
         <button type="button" data-home-view="skills">
-          <strong>${skills}</strong>
-          <span>${t("home.discovered")}</span>
+          <strong>${relationship.totalSkills}</strong>
+          <span>${t("home.metricDiscovered")}</span>
         </button>
         <button type="button" data-home-view="library">
-          <strong>${records}</strong>
-          <span>${t("home.managed")}</span>
+          <strong>${relationship.totalManaged}</strong>
+          <span>${t("home.metricManaged")}</span>
         </button>
         <button type="button" data-home-view="skills">
-          <strong>${highRisk}</strong>
-          <span>${t("home.review")}</span>
+          <strong>${relationship.needsAction}</strong>
+          <span>${t("home.metricNeedsAction")}</span>
         </button>
-        <button type="button" data-home-view="profiles">
-          <strong>${enabledProfiles}</strong>
-          <span>${t("home.agents")}</span>
+        <button type="button" data-home-view="library">
+          <strong>${relationship.copyGaps}</strong>
+          <span>${t("home.metricCopyGaps")}</span>
         </button>
       </div>
     </section>
+
+    <section class="relationship-panel">
+      <div class="relationship-section-head">
+        <h3>${t("home.actionsTitle")}</h3>
+      </div>
+      ${renderRelationshipActions(relationship)}
+    </section>
+
+    <section class="relationship-panel">
+      <div class="relationship-section-head">
+        <h3>${t("home.skillMapTitle")}</h3>
+        <button type="button" class="secondary-button" data-home-view="skills">${t("nav.skills")}</button>
+      </div>
+      ${renderSkillRelationshipTable(relationship.skills)}
+    </section>
+
+    <section class="relationship-panel">
+      <div class="relationship-section-head">
+        <h3>${t("home.agentMapTitle")}</h3>
+        <button type="button" class="secondary-button" data-home-view="profiles">${t("nav.profiles")}</button>
+      </div>
+      ${renderAgentRelationshipTable(relationship.agents)}
+    </section>
   `;
+}
+
+function buildHomeRelationship() {
+  const skills = state.catalog?.skills || [];
+  const records = state.library?.records || [];
+  const profiles = state.profiles?.profiles || state.runtime?.profiles || [];
+  const enabledProfiles = profiles.filter((profile) => profile.enabled !== false);
+  const roots = state.catalog?.roots || [];
+  const recordsByName = new Map(records.map((record) => [normalizeKey(record.name), record]));
+  const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
+  const profileByTool = buildProfileToolIndex(enabledProfiles);
+  const rootByTool = buildRootToolIndex(roots);
+  const skillNames = skills.map((skill) => normalizeKey(skill.name));
+  const nameCounts = new Map();
+  for (const name of skillNames) nameCounts.set(name, (nameCounts.get(name) || 0) + 1);
+
+  const agents = profiles.map((profile) => {
+    const profileSkills = skills.filter((skill) => skillMatchesProfile(skill, profile, profileByTool));
+    const uniqueNames = new Set(profileSkills.map((skill) => normalizeKey(skill.name)));
+    const highRisk = profileSkills.filter((skill) => skill.risk?.level === "high").length;
+    const managed = [...uniqueNames].filter((name) => recordsByName.has(name)).length;
+    const unique = [...uniqueNames].filter((name) => nameCounts.get(name) === 1).length;
+    const copied = records.filter((record) =>
+      (record.publishedTo || []).some((item) => item.profileId === profile.id),
+    ).length;
+    const root = rootByTool.get(profile.adapter) || rootByTool.get(profile.id);
+    const folderReady = root ? Boolean(root.exists && root.readable) : profile.enabled !== false;
+    return {
+      ...profile,
+      skills: profileSkills.length,
+      managed,
+      highRisk,
+      unique,
+      copied,
+      folderReady,
+      folderPath: profile.skillRoot || root?.path || "",
+    };
+  });
+
+  const relationshipSkills = buildRelationshipSkills({
+    skills,
+    records,
+    enabledProfiles,
+    profilesById,
+    profileByTool,
+  });
+  const unmanagedHighRisk = skills.filter(
+    (skill) => skill.risk?.level === "high" && !recordsByName.has(normalizeKey(skill.name)),
+  ).length;
+  const missingFolders = agents.filter((agent) => agent.enabled !== false && !agent.folderReady).length;
+  const conflicts = state.catalog?.counts?.conflicts || 0;
+  const unmanagedCopyGaps = records.filter((record) => !(record.publishedTo || []).length).length;
+  const copyGaps = relationshipSkills.reduce((sum, skill) => sum + skill.copyGap, 0);
+
+  return {
+    agents,
+    skills: relationshipSkills,
+    totalSkills: state.catalog?.counts?.skills || skills.length,
+    totalManaged: state.library?.counts?.records || records.length,
+    enabledProfiles: enabledProfiles.length,
+    needsAction: unmanagedHighRisk + missingFolders + conflicts,
+    unmanagedHighRisk,
+    missingFolders,
+    conflicts,
+    unmanagedCopyGaps,
+    copyGaps,
+  };
+}
+
+function buildRelationshipSkills({ skills, records, enabledProfiles, profilesById, profileByTool }) {
+  const byName = new Map();
+  for (const skill of skills) {
+    const key = normalizeKey(skill.name);
+    if (!byName.has(key)) {
+      byName.set(key, {
+        name: skill.name,
+        description: skill.description || "",
+        risk: skill.risk?.level || "low",
+        agents: new Set(),
+        instanceCount: 0,
+        managed: false,
+        copiedTo: new Set(),
+      });
+    }
+    const item = byName.get(key);
+    item.instanceCount += 1;
+    item.risk = strongestRisk(item.risk, skill.risk?.level || "low");
+    const profile = profileForSkill(skill, profileByTool);
+    if (profile) item.agents.add(profile.name);
+  }
+
+  for (const record of records) {
+    const key = normalizeKey(record.name);
+    if (!byName.has(key)) {
+      byName.set(key, {
+        name: record.name,
+        description: record.description || "",
+        risk: record.risk?.level || "low",
+        agents: new Set(),
+        instanceCount: 0,
+        managed: true,
+        copiedTo: new Set(),
+      });
+    }
+    const item = byName.get(key);
+    item.managed = true;
+    for (const publication of record.publishedTo || []) {
+      const profile = profilesById.get(publication.profileId);
+      if (profile) {
+        item.agents.add(profile.name);
+        item.copiedTo.add(profile.id);
+      }
+    }
+  }
+
+  return [...byName.values()]
+    .map((item) => ({
+      ...item,
+      agents: [...item.agents],
+      copyGap: item.managed ? Math.max(0, enabledProfiles.length - item.copiedTo.size) : 0,
+    }))
+    .sort((a, b) => {
+      if (a.risk !== b.risk) return riskWeight(b.risk) - riskWeight(a.risk);
+      if (a.managed !== b.managed) return a.managed ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+}
+
+function renderAgentRelationshipTable(agents) {
+  if (!agents.length) return `<p class="status-line compact">${t("profiles.none")}</p>`;
+  return `
+    <div class="relationship-table agent-relationship-table">
+      <div class="relationship-row relationship-row-head">
+        <span>${t("home.columnAgent")}</span>
+        <span>${t("home.columnSkills")}</span>
+        <span>${t("home.columnManaged")}</span>
+        <span>${t("home.columnRisk")}</span>
+        <span>${t("home.columnUnique")}</span>
+        <span>${t("home.columnCopied")}</span>
+        <span>${t("home.columnFolder")}</span>
+      </div>
+      ${agents
+        .map(
+          (agent) => `
+            <button type="button" class="relationship-row ${agent.enabled === false ? "is-disabled" : ""}" data-home-view="skills">
+              <span class="relationship-entity">
+                <strong>${escapeHtml(agent.name)}</strong>
+                <small>${escapeHtml(agent.folderPath || t("profiles.none"))}</small>
+              </span>
+              <span data-label="${escapeHtml(t("home.columnSkills"))}">${agent.skills}</span>
+              <span data-label="${escapeHtml(t("home.columnManaged"))}">${agent.managed}</span>
+              <span data-label="${escapeHtml(t("home.columnRisk"))}" class="${agent.highRisk ? "relationship-danger" : ""}">${agent.highRisk}</span>
+              <span data-label="${escapeHtml(t("home.columnUnique"))}">${agent.unique}</span>
+              <span data-label="${escapeHtml(t("home.columnCopied"))}">${agent.copied}</span>
+              <span data-label="${escapeHtml(t("home.columnFolder"))}"><span class="badge ${agent.folderReady ? "low" : "medium"}">${escapeHtml(agent.folderReady ? t("home.folderReady") : t("home.folderMissing"))}</span></span>
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderSkillRelationshipTable(skills) {
+  if (!skills.length) return `<p class="status-line compact">${t("skills.noMatchesTitle")}</p>`;
+  return `
+    <div class="relationship-table skill-relationship-table">
+      <div class="relationship-row relationship-row-head">
+        <span>${t("home.skillColumnSkill")}</span>
+        <span>${t("home.skillColumnAgents")}</span>
+        <span>${t("home.skillColumnState")}</span>
+      </div>
+      ${skills
+        .map((skill) => {
+          const visibleAgents = skill.agents.slice(0, 3);
+          const hiddenCount = Math.max(0, skill.agents.length - visibleAgents.length);
+          return `
+            <button type="button" class="relationship-row" data-home-view="${skill.managed ? "library" : "skills"}">
+              <span class="relationship-entity">
+                <strong>${escapeHtml(skill.name)}</strong>
+                <small>${escapeHtml(skill.description || "")}</small>
+                <small>${escapeHtml(t("home.instanceCount", { count: skill.instanceCount }))}</small>
+              </span>
+              <span class="agent-chip-list" data-label="${escapeHtml(t("home.skillColumnAgents"))}">
+                ${visibleAgents.map((agent) => `<span class="agent-chip">${escapeHtml(agent)}</span>`).join("")}
+                ${hiddenCount ? `<span class="agent-chip muted">${escapeHtml(t("home.skillMore", { count: hiddenCount }))}</span>` : ""}
+              </span>
+              <span class="relationship-state" data-label="${escapeHtml(t("home.skillColumnState"))}">
+                <span class="badge ${skill.risk}">${escapeHtml(t("risk.label", { level: riskName(skill.risk) }))}</span>
+                <span class="badge ${skill.managed ? "low" : "neutral"}">${escapeHtml(skill.managed ? t("governance.library") : t("home.foundOnly"))}</span>
+                ${skill.managed ? `<small>${escapeHtml(skill.copyGap ? t("home.copyGap", { count: skill.copyGap }) : t("home.noCopyGap"))}</small>` : ""}
+              </span>
+            </button>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderRelationshipActions(relationship) {
+  const actions = [];
+  if (relationship.unmanagedHighRisk) {
+    actions.push({
+      view: "skills",
+      primary: true,
+      title: t("home.actionHighRisk", { count: relationship.unmanagedHighRisk }),
+      body: t("home.actionHighRiskBody"),
+    });
+  }
+  if (relationship.unmanagedCopyGaps) {
+    actions.push({
+      view: "library",
+      title: t("home.actionCopyGaps", { count: relationship.unmanagedCopyGaps }),
+      body: t("home.actionCopyGapsBody"),
+    });
+  }
+  if (relationship.missingFolders) {
+    actions.push({
+      view: "profiles",
+      title: t("home.actionMissingFolders", { count: relationship.missingFolders }),
+      body: t("home.actionMissingFoldersBody"),
+    });
+  }
+  if (relationship.conflicts) {
+    actions.push({
+      view: "skills",
+      title: t("home.actionConflicts", { count: relationship.conflicts }),
+      body: t("home.actionConflictsBody"),
+    });
+  }
+  if (!actions.length) {
+    actions.push({
+      view: "skills",
+      title: t("home.actionReady"),
+      body: t("home.actionReadyBody"),
+    });
+  }
+  return `
+    <div class="relationship-actions">
+      ${actions
+        .map(
+          (action) => `
+            <button type="button" class="relationship-action ${action.primary ? "is-primary" : ""}" data-home-view="${escapeHtml(action.view)}">
+              <strong>${escapeHtml(action.title)}</strong>
+              <span>${escapeHtml(action.body)}</span>
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function buildProfileToolIndex(profiles) {
+  const index = new Map();
+  for (const profile of profiles) {
+    if (profile.adapter) {
+      index.set(profile.adapter, profile);
+      index.set(normalizeKey(profile.adapter), profile);
+    }
+    index.set(profile.id, profile);
+    index.set(normalizeKey(profile.id), profile);
+    index.set(normalizeKey(profile.name), profile);
+    for (const alias of profileToolAliases(profile)) {
+      index.set(alias, profile);
+    }
+  }
+  return index;
+}
+
+function profileToolAliases(profile) {
+  const aliases = {
+    claude: ["claude code", "claude"],
+    codex: ["codex"],
+    openclaw: ["openclaw"],
+  };
+  return aliases[normalizeKey(profile.adapter)] || [];
+}
+
+function buildRootToolIndex(roots) {
+  const index = new Map();
+  for (const root of roots) {
+    if (root.tool) index.set(root.tool, root);
+    if (root.key) index.set(root.key, root);
+  }
+  return index;
+}
+
+function skillMatchesProfile(skill, profile, profileByTool) {
+  return profileForSkill(skill, profileByTool)?.id === profile.id;
+}
+
+function profileForSkill(skill, profileByTool) {
+  return (
+    profileByTool.get(skill.tool) ||
+    profileByTool.get(normalizeKey(skill.tool || "")) ||
+    profileByTool.get(skill.rootKey) ||
+    profileByTool.get(normalizeKey(skill.rootKey || "")) ||
+    profileByTool.get(normalizeKey(skill.rootLabel || ""))
+  );
+}
+
+function normalizeKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function strongestRisk(current, next) {
+  return riskWeight(next) > riskWeight(current) ? next : current;
+}
+
+function riskWeight(level) {
+  if (level === "high") return 3;
+  if (level === "medium") return 2;
+  return 1;
 }
 
 function renderFirstRunRoots(roots) {
@@ -1850,6 +2377,8 @@ function renderSourcePreview(preview, mode = "preview") {
     state.sourcePreview = null;
     state.sourcePreviewMode = "preview";
     elements.sourcePreview.innerHTML = "";
+    syncDetailPaneVisibility();
+    renderSelectedDetail();
     syncImportActions();
     return;
   }
@@ -1858,14 +2387,12 @@ function renderSourcePreview(preview, mode = "preview") {
   state.sourcePreviewMode = mode;
   if (isNewPreview) state.aiInterpretation = null;
 
-  const suggestion = sourceSuggestion(preview);
   const previewModeLabel = mode === "installed" ? t("sourcePreview.added") : t("sourcePreview.analyzed");
   const files = preview.files || [];
   const scriptCount = files.filter((file) => file.kind === "script").length;
 
   elements.sourcePreview.innerHTML = `
     <div class="source-preview-card">
-      ${renderSuggestionBox(suggestion)}
       <section class="source-result-section">
         <div class="source-section-head">
           <h3>${t("sourcePreview.summaryTitle")}</h3>
@@ -1902,6 +2429,8 @@ function renderSourcePreview(preview, mode = "preview") {
       ${renderAiInterpretationSection()}
     </div>
   `;
+  syncDetailPaneVisibility();
+  renderSelectedDetail();
   syncImportActions();
 }
 
@@ -1997,15 +2526,8 @@ function renderLibraryAiInterpretationSection(record) {
 }
 
 function renderImportEmptySuggestion() {
-  elements.sourcePreview.innerHTML = `
-    <div class="source-preview-card import-empty-card">
-      ${renderSuggestionBox({
-        tone: "neutral",
-        body: t("suggestion.noPreview"),
-        next: t("workspace.import.subtitle"),
-      })}
-    </div>
-  `;
+  elements.sourcePreview.innerHTML = "";
+  syncDetailPaneVisibility();
 }
 
 function sourceSuggestion(preview) {
@@ -2050,13 +2572,13 @@ function renderSuggestionBox(suggestion) {
 
 function handleSourceFormChanged() {
   if (!state.sourcePreview) {
+    syncDetailPaneVisibility();
     syncImportActions();
     return;
   }
   state.sourcePreview = null;
   state.sourcePreviewMode = "preview";
   renderImportEmptySuggestion();
-  renderSelectedDetail();
   syncImportActions();
 }
 
@@ -2120,6 +2642,11 @@ function renderSkills() {
 }
 
 function renderSelectedDetail() {
+  if (shouldHideDetailPane()) {
+    elements.emptyDetail.classList.add("hidden");
+    elements.skillDetail.classList.add("hidden");
+    return;
+  }
   if (state.view === "library") {
     renderSelectedLibraryRecord();
     return;
@@ -2138,7 +2665,7 @@ function renderWorkspaceEmptyDetail() {
 }
 
 function renderWorkspaceInspector() {
-  setInspectorTitle(t("inspector.guideTitle"));
+  setInspectorTitle(state.view === "import" && state.sourcePreview ? t("inspector.resultTitle") : t("inspector.guideTitle"));
   setInspectorContext(t(`workspace.${state.view}.title`));
   if (state.view === "setup") return renderSetupInspector();
   if (state.view === "import") return renderImportInspector();
@@ -2170,37 +2697,43 @@ function renderSetupInspector() {
 }
 
 function renderImportInspector() {
-  const suggestion = state.sourcePreview
-    ? sourceSuggestion(state.sourcePreview)
-    : {
-        tone: "neutral",
-        body: t("suggestion.noPreview"),
-        next: t("workspace.import.subtitle"),
-      };
+  const preview = state.sourcePreview;
+  if (!preview) return "";
+  const suggestion = sourceSuggestion(preview);
+  const files = preview.files || [];
+  const scriptCount = files.filter((file) => file.kind === "script").length;
+  const previewModeLabel = state.sourcePreviewMode === "installed" ? t("sourcePreview.added") : t("sourcePreview.analyzed");
   return `
     ${renderInspectorHeader({
-      title: t("inspector.importTitle"),
-      body: t("workspace.import.subtitle"),
-      badges: [{ label: t("inspector.ready"), tone: "low" }],
+      title: t("inspector.importResultTitle"),
+      body: preview.name,
+      badges: [
+        { label: previewModeLabel, tone: "neutral" },
+        { label: t("risk.label", { level: riskName(preview.risk?.level || "low") }), tone: preview.risk?.level || "low" },
+      ],
     })}
     <section class="detail-section">
       <h3>${t("suggestion.title")}</h3>
       ${renderSuggestionBox(suggestion)}
     </section>
     <section class="detail-section">
-      <h3>${t("inspector.localState")}</h3>
-      <div class="runtime-stats runtime-stats-wide">
-        <div class="runtime-stat"><strong>${state.library?.counts?.records || 0}</strong><span>${t("governance.library")}</span></div>
-        <div class="runtime-stat"><strong>${state.library?.counts?.publications || 0}</strong><span>${t("inspector.published")}</span></div>
-        <div class="runtime-stat"><strong>${state.library?.counts?.blocked || 0}</strong><span>${t("trust.blocked")}</span></div>
-        <div class="runtime-stat"><strong>${state.catalog?.counts?.highRisk || 0}</strong><span>${t("risk.high")}</span></div>
-      </div>
+      <h3>${t("sourcePreview.summaryTitle")}</h3>
+      <dl class="kv">
+        <dt>${t("sourcePreview.checkStats")}</dt>
+        <dd><strong>${escapeHtml(t("sourcePreview.filesChecked", { count: files.length }))} · ${escapeHtml(t("sourcePreview.scriptsFound", { count: scriptCount }))}</strong></dd>
+        <dt>${t("sourcePreview.sourcePath")}</dt>
+        <dd>${escapeHtml(preview.origin?.url || preview.origin?.path || preview.skillPath || "")}</dd>
+        ${
+          preview.origin?.resolvedCommit
+            ? `<dt>${t("labels.resolvedCommit")}</dt><dd>${escapeHtml(preview.origin.resolvedShortCommit || preview.origin.resolvedCommit.slice(0, 12))}</dd>`
+            : ""
+        }
+      </dl>
     </section>
-    ${renderStepSection([
-      { text: t("inspector.stepPreview"), current: true },
-      { text: t("inspector.stepInstall") },
-      { text: t("inspector.stepPublish") },
-    ])}
+    <section class="detail-section">
+      <h3>${t("sourcePreview.validationTitle")}</h3>
+      ${renderSourceValidation(preview)}
+    </section>
   `;
 }
 
@@ -2253,31 +2786,50 @@ function renderBridgeInspector() {
 function renderProfilesInspector() {
   const profiles = state.profiles?.profiles || state.runtime?.profiles || [];
   const enabled = profiles.filter((profile) => profile.enabled !== false);
+  const disabledCount = Math.max(0, profiles.length - enabled.length);
   return `
     ${renderInspectorHeader({
-      title: t("inspector.profilesTitle"),
-      body: t("workspace.profiles.subtitle"),
-      badges: [{ label: `${enabled.length}/${profiles.length} ${t("profiles.enabled")}`, tone: enabled.length ? "low" : "medium" }],
+      title: t("profiles.targetPreviewTitle"),
+      body: t("profiles.targetPreviewBody"),
+      badges: [
+        { label: t("profiles.enabledSummary", { enabled: enabled.length, total: profiles.length }), tone: enabled.length ? "low" : "medium" },
+        ...(disabledCount ? [{ label: t("profiles.disabledSummary", { count: disabledCount }), tone: "neutral" }] : []),
+      ],
     })}
     <section class="detail-section">
-      <h3>${t("inspector.localState")}</h3>
-      <ul class="inspector-list">
-        ${profiles
-          .map(
-            (profile) => `
-              <li>
-                <span>
-                  <strong>${escapeHtml(profile.name)}</strong>
-                  <small>${escapeHtml(profile.skillRoot)}</small>
-                </span>
-                <span class="badge ${profile.enabled ? "low" : "neutral"}">${escapeHtml(profile.enabled ? t("profiles.enabled") : t("profiles.disabled"))}</span>
-              </li>
-            `,
-          )
-          .join("")}
-      </ul>
+      <h3>${t("sections.distributionTargets")}</h3>
+      ${renderProfileTargetPreview(profiles)}
     </section>
-    ${renderStepSection([{ text: t("inspector.stepProfiles"), current: true }])}
+    <section class="detail-section compact-note">
+      <h3>${t("profiles.targetNoteTitle")}</h3>
+      <p>${t("profiles.targetNoteBody")}</p>
+    </section>
+  `;
+}
+
+function renderProfileTargetPreview(profiles) {
+  if (!profiles.length) return `<p class="status-line compact">${t("profiles.noEnabledTargets")}</p>`;
+  return `
+    <ul class="profile-target-preview">
+      ${profiles
+        .map((profile) => {
+          const enabled = profile.enabled !== false;
+          const typeLabel = profile.canDelete ? t("profiles.custom") : t("profiles.default");
+          return `
+            <li class="${enabled ? "enabled" : "disabled"}">
+              <span>
+                <strong>${escapeHtml(profile.name)}</strong>
+                <small>${escapeHtml(profile.skillRoot)}</small>
+              </span>
+              <span class="profile-target-meta">
+                <span class="badge neutral">${escapeHtml(typeLabel)}</span>
+                <span class="badge ${enabled ? "low" : "neutral"}">${escapeHtml(enabled ? t("profiles.readyTarget") : t("profiles.disabledTarget"))}</span>
+              </span>
+            </li>
+          `;
+        })
+        .join("")}
+    </ul>
   `;
 }
 
@@ -3141,6 +3693,66 @@ async function saveProfile(profileId, payload) {
   setStatus(t("status.profileSaved"));
 }
 
+async function createProfile(payload) {
+  setStatus(t("status.savingProfile"));
+  const response = await fetch("/api/profiles", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    setStatus(error.detail || t("status.saveFailed", { status: response.status }));
+    return;
+  }
+  await refreshCatalogAndRuntime();
+  setStatus(t("status.profileSaved"));
+}
+
+async function deleteProfile(profileId) {
+  setStatus(t("status.savingProfile"));
+  const response = await fetch(`/api/profiles/${encodeURIComponent(profileId)}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    setStatus(error.detail || t("status.saveFailed", { status: response.status }));
+    return;
+  }
+  await refreshCatalogAndRuntime();
+  setStatus(t("status.profileDeleted"));
+}
+
+async function pickSkillRoot(trigger) {
+  const input = trigger.closest("form")?.querySelector('input[name="skillRoot"]');
+  const invoke = getTauriInvoke();
+  if (!(input instanceof HTMLInputElement) || !invoke) {
+    setStatus(t("status.folderPickerUnavailable"));
+    return;
+  }
+  if (trigger instanceof HTMLButtonElement) trigger.disabled = true;
+  try {
+    const selectedPath = await invoke("pick_agent_skill_folder", {});
+    if (typeof selectedPath === "string" && selectedPath.trim()) {
+      input.value = selectedPath.trim();
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.focus();
+    }
+  } catch (error) {
+    setStatus(t("status.folderPickerFailed", { status: error?.message || String(error) }));
+  } finally {
+    if (trigger instanceof HTMLButtonElement) trigger.disabled = false;
+  }
+}
+
+function getTauriInvoke() {
+  return window.__TAURI_INTERNALS__?.invoke || null;
+}
+
+function isTauriApp() {
+  return Boolean(window.isTauri && getTauriInvoke());
+}
+
 async function resetProfileSettings() {
   setStatus(t("status.savingProfile"));
   const response = await fetch("/api/profiles/reset", {
@@ -3679,12 +4291,12 @@ function statusName(status) {
     completed: state.language === "zh" ? "已完成" : "completed",
     warning: state.language === "zh" ? "警告" : "warning",
     error: state.language === "zh" ? "错误" : "error",
-    ready: state.language === "zh" ? "可添加" : "ready to add",
+    ready: state.language === "zh" ? "可保存" : "ready to save",
     managed: state.language === "zh" ? "已复制" : "copied",
-    adopted: state.language === "zh" ? "本机库" : "in library",
-    "adopted-existing": state.language === "zh" ? "本机库" : "in library",
-    unmanaged: state.language === "zh" ? "仅发现" : "found only",
-    library: state.language === "zh" ? "本机库" : "local library",
+    adopted: state.language === "zh" ? "已纳管" : "managed",
+    "adopted-existing": state.language === "zh" ? "已纳管" : "managed",
+    unmanaged: state.language === "zh" ? "未纳管" : "found only",
+    library: state.language === "zh" ? "已纳管" : "managed",
   };
   return names[status] || status;
 }

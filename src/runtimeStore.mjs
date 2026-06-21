@@ -39,6 +39,7 @@ const DEFAULT_PROFILES = [
     publishMode: "managed-mirror",
   },
 ];
+const DEFAULT_PROFILE_IDS = new Set(DEFAULT_PROFILES.map((profile) => profile.id));
 
 export function getManagerHome({ env = process.env } = {}) {
   return path.resolve(expandHome(env.SKILLSMANGER_HOME || "~/.skillsmanager"));
@@ -82,10 +83,55 @@ export async function getProfiles(options = {}) {
   };
 }
 
+export async function createProfile(request = {}, options = {}) {
+  const home = getManagerHome(options);
+  await ensureStore(home);
+  const profiles = normalizeProfiles(await readJson(path.join(home, "profiles.json"), DEFAULT_PROFILES));
+  const name = cleanProfileText(request.name);
+  const skillRoot = cleanProfileText(request.skillRoot);
+  if (!name) {
+    const error = new Error("Agent name is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+  if (!skillRoot) {
+    const error = new Error("Skills folder is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+  const baseId = slugProfileId(request.id || name || "custom-agent") || "custom-agent";
+  const id = uniqueProfileId(baseId, profiles);
+  const nextProfile = normalizeProfile({
+    ...request,
+    id,
+    name,
+    skillRoot,
+    adapter: "custom",
+    enabled: request.enabled !== false,
+  });
+  profiles.push(nextProfile);
+  await writeJson(path.join(home, "profiles.json"), profiles);
+
+  return {
+    profile: nextProfile,
+    profiles,
+  };
+}
+
 export async function updateProfile(profileId, request = {}, options = {}) {
   const home = getManagerHome(options);
   await ensureStore(home);
   const profiles = normalizeProfiles(await readJson(path.join(home, "profiles.json"), DEFAULT_PROFILES));
+  if (Object.hasOwn(request, "name") && !cleanProfileText(request.name)) {
+    const error = new Error("Agent name is required.");
+    error.statusCode = 400;
+    throw error;
+  }
+  if (Object.hasOwn(request, "skillRoot") && !cleanProfileText(request.skillRoot)) {
+    const error = new Error("Skills folder is required.");
+    error.statusCode = 400;
+    throw error;
+  }
   const nextProfile = normalizeProfile({
     ...(profiles.find((profile) => profile.id === profileId) || { id: profileId }),
     ...request,
@@ -102,6 +148,28 @@ export async function updateProfile(profileId, request = {}, options = {}) {
   return {
     profile: nextProfile,
     profiles,
+  };
+}
+
+export async function deleteProfile(profileId, options = {}) {
+  const home = getManagerHome(options);
+  await ensureStore(home);
+  if (DEFAULT_PROFILE_IDS.has(profileId)) {
+    const error = new Error("Default agent folders can be disabled or reset, but not deleted.");
+    error.statusCode = 400;
+    throw error;
+  }
+  const profiles = normalizeProfiles(await readJson(path.join(home, "profiles.json"), DEFAULT_PROFILES));
+  const nextProfiles = profiles.filter((profile) => profile.id !== profileId);
+  if (nextProfiles.length === profiles.length) {
+    const error = new Error("Agent folder not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+  await writeJson(path.join(home, "profiles.json"), nextProfiles);
+
+  return {
+    profiles: nextProfiles,
   };
 }
 
@@ -380,13 +448,18 @@ function normalizeProfile(profile) {
 
   return {
     id,
-    name: String(profile.name || id),
+    name: cleanProfileText(profile.name) || id,
     adapter,
-    skillRoot: String(profile.skillRoot || `~/.${adapter}/skills`),
+    skillRoot: cleanProfileText(profile.skillRoot) || `~/.${adapter}/skills`,
     secretScope: profile.secretScope === "global" ? "global" : "profile",
     enabled: profile.enabled !== false,
     publishMode,
+    canDelete: !DEFAULT_PROFILE_IDS.has(id),
   };
+}
+
+function cleanProfileText(value) {
+  return String(value ?? "").trim();
 }
 
 function slugProfileId(value) {
@@ -396,6 +469,16 @@ function slugProfileId(value) {
     .replace(/[^a-z0-9._-]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
+}
+
+function uniqueProfileId(baseId, profiles) {
+  const used = new Set(profiles.map((profile) => profile.id));
+  if (!used.has(baseId)) return baseId;
+  for (let index = 2; index < 1000; index += 1) {
+    const candidate = `${baseId}-${index}`;
+    if (!used.has(candidate)) return candidate;
+  }
+  return `${baseId}-${randomUUID().slice(0, 8)}`;
 }
 
 function resolveSkill(catalog, skillId) {

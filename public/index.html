@@ -10,10 +10,10 @@
     <div class="app-frame">
       <header class="topbar">
         <div class="brand">
-          <div class="brand-mark">SM</div>
+          <img class="brand-mark" src="/app-icon.png" alt="" aria-hidden="true" />
           <div>
             <h1>Skills Manager</h1>
-            <p data-i18n="app.tagline">Discover, review, and copy local Agent Skills</p>
+            <p data-i18n="app.tagline">Manage and copy local Agent Skills</p>
           </div>
         </div>
         <div class="topbar-actions">
@@ -32,16 +32,16 @@
         <aside class="sidebar" aria-label="Workspace navigation">
           <nav class="workspace-nav" aria-label="Workspaces">
             <button type="button" data-view="setup">
-              <strong data-i18n="nav.setup">Discover</strong>
-              <span data-i18n="nav.setupHint">Find existing skills</span>
+              <strong data-i18n="nav.setup">Console</strong>
+              <span data-i18n="nav.setupHint">Local agent skills overview</span>
             </button>
             <button type="button" data-view="skills">
-              <strong data-i18n="nav.skills">Review</strong>
-              <span data-i18n="nav.skillsHint">Decide what enters the library</span>
+              <strong data-i18n="nav.skills">All Skills</strong>
+              <span data-i18n="nav.skillsHint">Scanned results and risk</span>
             </button>
             <button type="button" data-view="library">
-              <strong data-i18n="nav.library">My Library</strong>
-              <span data-i18n="nav.libraryHint">Ready to copy</span>
+              <strong data-i18n="nav.library">Managed Skills</strong>
+              <span data-i18n="nav.libraryHint">Managed, ready to copy</span>
             </button>
             <button type="button" data-view="import">
               <strong data-i18n="nav.import">Get Skills</strong>
@@ -58,9 +58,9 @@
         <section class="work-pane" aria-label="Workspace">
           <div class="workspace-header">
             <div>
-              <div class="workspace-kicker" id="workspaceKicker">Setup</div>
-              <h2 id="workspaceTitle">First Run Import</h2>
-              <p id="workspaceSubtitle">Review existing local skills before adding them to your library.</p>
+              <div class="workspace-kicker" id="workspaceKicker">Console</div>
+              <h2 id="workspaceTitle">Local Agent Skills Console</h2>
+              <p id="workspaceSubtitle">See skills found across local agents, risk signals, managed skills, and copy targets in one place.</p>
             </div>
             <button id="refreshButton" type="button" data-i18n="actions.refresh">Scan Mac</button>
           </div>
@@ -71,18 +71,12 @@
             <section id="firstRunImport" class="first-run-import hidden" aria-label="First run import"></section>
             <div class="empty-card" id="firstRunDone">
               <h3 data-i18n="setup.doneTitle">Local console is ready</h3>
-              <p data-i18n="setup.doneBody">Your Mac has been scanned. Review discovered skills, get new ones, or copy library skills to an agent.</p>
+              <p data-i18n="setup.doneBody">Your Mac has been scanned. Use the console to review all local agent skills, manage trusted ones, and copy them to agents.</p>
             </div>
-            <section class="discover-card roots" aria-label="Scanned roots">
-              <div class="section-title" data-i18n="sections.scannedRoots">Scanned Roots</div>
-              <div id="rootList" class="root-list"></div>
-            </section>
+            <div id="rootList" class="hidden" hidden></div>
           </section>
 
           <section id="viewSkills" class="view-panel" data-view-panel="skills">
-            <div class="scope-note" data-i18n="skills.scopeNote">
-              This is the full list found by scanning your Mac. Found only means it still lives in an agent folder; In library means it has been added locally; Copied means it is available in an agent.
-            </div>
             <div class="toolbar">
               <input id="searchInput" type="search" data-i18n-placeholder="filters.search" placeholder="Search skills, tools, paths" />
               <select id="riskFilter" aria-label="Risk filter">
@@ -129,7 +123,7 @@
                 </label>
                 <label class="check-row">
                   <input name="replace" type="checkbox" />
-                  <span data-i18n="import.replace">Allow replacing a same-name skill in My Library</span>
+                  <span data-i18n="import.replace">Allow replacing a same-name saved skill</span>
                 </label>
                 <label class="check-row">
                   <input name="pin" type="checkbox" />
@@ -138,7 +132,7 @@
               </details>
               <div class="source-import-actions">
                 <button id="previewSourceButton" type="button" data-i18n="actions.preview">Check skill</button>
-                <button id="installSourceButton" type="button" data-i18n="actions.install">Add to library</button>
+                <button id="installSourceButton" type="button" data-i18n="actions.install">Save skill</button>
               </div>
             </form>
             <section id="sourceHistory" class="source-history" aria-label="Recent sources"></section>

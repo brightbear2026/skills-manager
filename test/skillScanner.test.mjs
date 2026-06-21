@@ -26,7 +26,9 @@ import {
 import { ensureBridgeSkill } from "../src/bridgeStore.mjs";
 import {
   completeInvocation,
+  createProfile,
   createInvocation,
+  deleteProfile,
   deleteProfileSecret,
   getProfileSecrets,
   getProfiles,
@@ -1541,6 +1543,75 @@ Use the profile skill.
     ),
     /disabled/,
   );
+});
+
+test("custom agent folders can be created, used, and deleted", async () => {
+  const tmp = await mkdtemp(path.join(os.tmpdir(), "skillsmanger-custom-profile-"));
+  const home = path.join(tmp, "manager");
+  const sourceSkill = path.join(tmp, "custom-profile-skill");
+  const customRoot = path.join(tmp, "custom-agent-skills");
+  await mkdir(sourceSkill, { recursive: true });
+  await writeFile(
+    path.join(sourceSkill, "SKILL.md"),
+    `---
+name: custom-profile-skill
+description: Custom profile skill.
+version: 1.0.0
+---
+
+Use the custom profile skill.
+`,
+    "utf8",
+  );
+
+  const options = {
+    env: {
+      SKILLSMANGER_HOME: home,
+    },
+  };
+  await resetProfiles(options);
+  await assert.rejects(
+    createProfile(
+      {
+        name: "Broken Agent",
+        skillRoot: " ",
+      },
+      options,
+    ),
+    /Skills folder is required/,
+  );
+  const created = await createProfile(
+    {
+      name: "  My Local Agent  ",
+      skillRoot: ` ${customRoot} `,
+    },
+    options,
+  );
+  assert.equal(created.profile.name, "My Local Agent");
+  assert.equal(created.profile.skillRoot, customRoot);
+  assert.equal(created.profile.adapter, "custom");
+  assert.equal(created.profile.canDelete, true);
+
+  const installed = await installSkillSource(
+    {
+      source: sourceSkill,
+      invocationMode: "native",
+    },
+    options,
+  );
+  await publishLibraryRecord(
+    installed.install.record.id,
+    {
+      profileId: created.profile.id,
+      publishMode: "copy",
+    },
+    options,
+  );
+  assert.match(await readFile(path.join(customRoot, "custom-profile-skill", "SKILL.md"), "utf8"), /Custom profile skill/);
+
+  await assert.rejects(deleteProfile("codex", options), /Default agent folders/);
+  const deleted = await deleteProfile(created.profile.id, options);
+  assert.equal(deleted.profiles.some((profile) => profile.id === created.profile.id), false);
 });
 
 test("github source preview records resolved commits and diffs existing library records", async () => {

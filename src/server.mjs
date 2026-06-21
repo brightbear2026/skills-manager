@@ -25,7 +25,9 @@ import { ensureBridgeSkill } from "./bridgeStore.mjs";
 import { scanCatalog } from "./skillScanner.mjs";
 import {
   completeInvocation,
+  createProfile,
   createInvocation,
+  deleteProfile,
   deleteProfileSecret,
   getProfileSecrets,
   getProfiles,
@@ -76,9 +78,15 @@ const server = createServer(async (request, response) => {
       return json(response, runtime);
     }
 
-    if (url.pathname === "/api/profiles") {
+    if (url.pathname === "/api/profiles" && request.method === "GET") {
       const profiles = await getProfiles();
       return json(response, profiles);
+    }
+
+    if (url.pathname === "/api/profiles" && request.method === "POST") {
+      const payload = await readJsonBody(request);
+      const result = await createProfile(payload);
+      return json(response, result, 201);
     }
 
     if (url.pathname === "/api/profiles/reset" && request.method === "POST") {
@@ -90,6 +98,10 @@ const server = createServer(async (request, response) => {
     if (profileMatch && request.method === "POST") {
       const payload = await readJsonBody(request);
       const result = await updateProfile(decodeURIComponent(profileMatch[1]), payload);
+      return json(response, result);
+    }
+    if (profileMatch && request.method === "DELETE") {
+      const result = await deleteProfile(decodeURIComponent(profileMatch[1]));
       return json(response, result);
     }
 
