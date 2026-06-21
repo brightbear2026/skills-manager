@@ -100,7 +100,7 @@ Returns local service health metadata for app shells, menu bar status, and CLI c
 {
   "ok": true,
   "service": "com.skillsmanager.local",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "port": 5173,
   "baseUrl": "http://127.0.0.1:5173"
 }

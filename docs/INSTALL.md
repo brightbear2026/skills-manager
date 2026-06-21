@@ -4,7 +4,7 @@
 
 macOS Apple Silicon:
 
-[Download Skills-Manager_0.5.0_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.0_aarch64.dmg)
+[Download Skills-Manager_0.5.1_aarch64.dmg](https://github.com/brightbear2026/skills-manager/releases/latest/download/Skills-Manager_0.5.1_aarch64.dmg)
 
 Releases:
 
@@ -67,5 +67,5 @@ Outputs:
 
 ```text
 src-tauri/target/release/bundle/macos/Skills Manager.app
-src-tauri/target/release/bundle/dmg/Skills Manager_0.5.0_aarch64.dmg
+src-tauri/target/release/bundle/dmg/Skills Manager_0.5.1_aarch64.dmg
 ```

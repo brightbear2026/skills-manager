@@ -5,7 +5,7 @@ import { getManagerHome } from "./runtimeStore.mjs";
 
 export const SERVICE_LABEL = "com.skillsmanager.local";
 export const DEFAULT_PORT = 5173;
-export const APP_VERSION = "0.5.0";
+export const APP_VERSION = "0.5.1";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_PROJECT_ROOT = path.resolve(__dirname, "..");
