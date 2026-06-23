@@ -144,6 +144,7 @@ const TRANSLATIONS = {
     "actions.refresh": "Scan Mac",
     "actions.preview": "Check skill",
     "actions.install": "Save skill",
+    "actions.viewSavedSkill": "View saved skill",
     "actions.finish": "Done",
     "actions.adoptLowRisk": "Add safe skills",
     "actions.adoptSelected": "Add selected ({count})",
@@ -246,6 +247,7 @@ const TRANSLATIONS = {
     "status.installingSource": "Saving source...",
     "status.installFailed": "Install failed: {status}",
     "status.installedSource": "Saved {name}.",
+    "status.sourceAlreadySaved": "{name} is already saved.",
     "status.savingTrust": "Saving copy decision...",
     "status.trustSaved": "Copy decision saved as {status}.",
     "status.installingBridge": "Installing bridge skill...",
@@ -608,6 +610,7 @@ const TRANSLATIONS = {
     "actions.refresh": "扫描本机",
     "actions.preview": "检查这个 skill",
     "actions.install": "保存 skill",
+    "actions.viewSavedSkill": "查看已纳管",
     "actions.finish": "完成",
     "actions.adoptLowRisk": "保存安全项",
     "actions.adoptSelected": "添加已选（{count}）",
@@ -710,6 +713,7 @@ const TRANSLATIONS = {
     "status.installingSource": "正在保存 skill...",
     "status.installFailed": "安装失败：{status}",
     "status.installedSource": "已保存 {name}。",
+    "status.sourceAlreadySaved": "{name} 已经保存。",
     "status.savingTrust": "正在保存复制决定...",
     "status.trustSaved": "复制决定已保存为 {status}。",
     "status.installingBridge": "正在安装 bridge skill...",
@@ -3824,6 +3828,12 @@ async function installSource() {
     setStatus(t("status.analyzeFirst"));
     return;
   }
+  const existingRecordId = getSavedSourceRecordId();
+  if (existingRecordId && !payload.replace) {
+    openLibraryRecord(existingRecordId);
+    setStatus(t("status.sourceAlreadySaved", { name: state.sourcePreview.name }));
+    return;
+  }
   setImportBusy(true);
   setStatus(t("status.installingSource"));
   try {
@@ -3838,15 +3848,44 @@ async function installSource() {
       return;
     }
     const result = await response.json();
-    state.selectionType = "library";
-    state.selectedRecordId = result.install.record.id;
-    setView("library");
+    const recordId = result.install.record.id;
+    const installedPreview = {
+      ...result.preview,
+      libraryRecord: {
+        exists: true,
+        id: recordId,
+        name: result.install.record.name,
+        version: result.install.record.version,
+        fingerprint: result.install.record.fingerprint,
+        libraryPath: result.install.record.libraryPath,
+        status: result.install.record.status,
+        updatedAt: result.install.record.updatedAt || result.install.record.installedAt || null,
+      },
+    };
+    renderSourcePreview(installedPreview, "installed");
     await refreshCatalogAndRuntime();
-    renderSourcePreview(result.preview, "installed");
+    state.selectionType = "library";
+    state.selectedRecordId = recordId;
+    setView("library");
     setStatus(t("status.installedSource", { name: result.install.record.name }));
   } finally {
     setImportBusy(false);
   }
+}
+
+function getSavedSourceRecordId(preview = state.sourcePreview) {
+  const record = preview?.libraryRecord;
+  if (!record?.exists || !record.id) return null;
+  if (record.fingerprint && preview.fingerprint && record.fingerprint !== preview.fingerprint) return null;
+  return record.id;
+}
+
+function openLibraryRecord(recordId) {
+  state.selectionType = "library";
+  state.selectedRecordId = recordId;
+  setView("library");
+  renderLibrary();
+  renderSelectedDetail();
 }
 
 function getSourcePayload() {
@@ -3869,6 +3908,9 @@ function setImportBusy(isBusy) {
 function syncImportActions() {
   elements.previewSourceButton.disabled = state.importBusy;
   elements.installSourceButton.disabled = state.importBusy || !state.sourcePreview;
+  elements.installSourceButton.textContent = getSavedSourceRecordId()
+    ? t("actions.viewSavedSkill")
+    : t("actions.install");
 }
 
 function renderAiSettingsForm() {
