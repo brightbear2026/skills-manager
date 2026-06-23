@@ -642,6 +642,19 @@ select {
   margin: 0;
 }
 
+.source-duplicate-summary {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  padding: 9px;
+}
+
+.source-duplicate-summary p {
+  margin: 0;
+}
+
 .source-validation {
   display: grid;
   gap: 8px;

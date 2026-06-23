@@ -145,6 +145,8 @@ const TRANSLATIONS = {
     "actions.preview": "Check skill",
     "actions.install": "Save skill",
     "actions.viewSavedSkill": "View saved skill",
+    "actions.updateSavedSkill": "Update saved skill",
+    "actions.saveNewVersion": "Save as new version",
     "actions.finish": "Done",
     "actions.adoptLowRisk": "Add safe skills",
     "actions.adoptSelected": "Add selected ({count})",
@@ -321,8 +323,20 @@ const TRANSLATIONS = {
     "sourcePreview.aiRunning": "Interpreting...",
     "sourcePreview.aiResult": "AI result",
     "sourcePreview.aiSummary": "What it does",
+    "sourcePreview.aiCapabilities": "Capabilities",
+    "sourcePreview.aiUseCases": "When to use it",
+    "sourcePreview.aiHowToUse": "How it works",
+    "sourcePreview.aiInputsOutputs": "Inputs / outputs",
     "sourcePreview.aiRisk": "Risk explanation",
+    "sourcePreview.aiFiles": "Files to review",
     "sourcePreview.aiRecommendation": "Recommended next step",
+    "sourcePreview.aiDistribution": "Copy decision",
+    "sourcePreview.aiCached": "Saved result",
+    "sourcePreview.duplicateTitle": "Saved versions",
+    "sourcePreview.duplicateAlready": "This exact version is already managed.",
+    "sourcePreview.duplicateUpdate": "Same name and version are already managed, but the content changed. Updating will replace the saved version.",
+    "sourcePreview.duplicateNewVersion": "This skill name is already managed with other versions. Saving will add a new version.",
+    "sourcePreview.duplicateNew": "This skill is not managed yet.",
     "sourcePreview.filesChecked": "{count} file(s) checked",
     "sourcePreview.scriptsFound": "{count} script file(s)",
     "sourcePreview.noValidationIssues": "No validation issues.",
@@ -611,6 +625,8 @@ const TRANSLATIONS = {
     "actions.preview": "检查这个 skill",
     "actions.install": "保存 skill",
     "actions.viewSavedSkill": "查看已纳管",
+    "actions.updateSavedSkill": "更新已纳管",
+    "actions.saveNewVersion": "保存为新版本",
     "actions.finish": "完成",
     "actions.adoptLowRisk": "保存安全项",
     "actions.adoptSelected": "添加已选（{count}）",
@@ -787,8 +803,20 @@ const TRANSLATIONS = {
     "sourcePreview.aiRunning": "解读中...",
     "sourcePreview.aiResult": "AI 结果",
     "sourcePreview.aiSummary": "它做什么",
+    "sourcePreview.aiCapabilities": "能做什么",
+    "sourcePreview.aiUseCases": "适合什么时候用",
+    "sourcePreview.aiHowToUse": "怎么使用",
+    "sourcePreview.aiInputsOutputs": "输入 / 输出",
     "sourcePreview.aiRisk": "风险解释",
+    "sourcePreview.aiFiles": "建议查看的文件",
     "sourcePreview.aiRecommendation": "建议操作",
+    "sourcePreview.aiDistribution": "复制建议",
+    "sourcePreview.aiCached": "已保存结果",
+    "sourcePreview.duplicateTitle": "已纳管版本",
+    "sourcePreview.duplicateAlready": "完全相同的版本已经纳管。",
+    "sourcePreview.duplicateUpdate": "同名同版本已经纳管，但内容发生变化。更新会替换已纳管版本。",
+    "sourcePreview.duplicateNewVersion": "这个 skill 名称已有其他版本。保存后会作为新版本纳管。",
+    "sourcePreview.duplicateNew": "这个 skill 尚未纳管。",
     "sourcePreview.filesChecked": "已检查 {count} 个文件",
     "sourcePreview.scriptsFound": "{count} 个脚本文件",
     "sourcePreview.noValidationIssues": "没有校验问题。",
@@ -2419,6 +2447,7 @@ function renderSourcePreview(preview, mode = "preview") {
             : ""
         }
         <code>${escapeHtml(preview.origin?.url || preview.origin?.path || preview.skillPath)}</code>
+        ${renderSourceDuplicateSummary(preview)}
       </section>
 
       <section class="source-result-section">
@@ -2462,12 +2491,18 @@ function renderAiOutput(interpretation) {
   const sections = interpretation.sections || {};
   const rows = [
     { title: t("sourcePreview.aiSummary"), body: sections.summary || interpretation.text },
+    { title: t("sourcePreview.aiCapabilities"), body: sections.capabilities },
+    { title: t("sourcePreview.aiUseCases"), body: sections.useCases },
+    { title: t("sourcePreview.aiHowToUse"), body: sections.howToUse },
+    { title: t("sourcePreview.aiInputsOutputs"), body: sections.inputsOutputs },
     { title: t("sourcePreview.aiRisk"), body: sections.riskExplanation },
+    { title: t("sourcePreview.aiFiles"), body: sections.filesToReview },
     { title: t("sourcePreview.aiRecommendation"), body: sections.recommendation },
+    { title: t("sourcePreview.aiDistribution"), body: sections.distributionDecision },
   ].filter((row) => row.body);
   return `
     <div class="ai-output">
-      <strong>${t("sourcePreview.aiResult")}</strong>
+      <strong>${t("sourcePreview.aiResult")}${interpretation.cached ? ` · ${t("sourcePreview.aiCached")}` : ""}</strong>
       <div class="ai-output-grid">
         ${rows
           .map(
@@ -2481,6 +2516,32 @@ function renderAiOutput(interpretation) {
           .join("")}
       </div>
       <small>${escapeHtml(interpretation.model)} · ${escapeHtml(formatTime(interpretation.interpretedAt))}</small>
+    </div>
+  `;
+}
+
+function renderSourceDuplicateSummary(preview) {
+  const action = preview.sourceAction || getSourceAction(preview);
+  const related = preview.relatedRecords || [];
+  const messageKey =
+    action.type === "already-saved"
+      ? "sourcePreview.duplicateAlready"
+      : action.type === "update-existing"
+        ? "sourcePreview.duplicateUpdate"
+        : action.type === "new-version"
+          ? "sourcePreview.duplicateNewVersion"
+          : "sourcePreview.duplicateNew";
+  return `
+    <div class="source-duplicate-summary">
+      <strong>${escapeHtml(t("sourcePreview.duplicateTitle"))}</strong>
+      <p>${escapeHtml(t(messageKey))}</p>
+      ${
+        related.length
+          ? `<div class="badge-line">${related
+              .map((record) => `<span class="badge neutral">${escapeHtml(record.version)} · ${escapeHtml(record.fingerprint?.slice(0, 8) || "")}</span>`)
+              .join("")}</div>`
+          : ""
+      }
     </div>
   `;
 }
@@ -3828,11 +3889,15 @@ async function installSource() {
     setStatus(t("status.analyzeFirst"));
     return;
   }
+  const sourceAction = getSourceAction();
   const existingRecordId = getSavedSourceRecordId();
-  if (existingRecordId && !payload.replace) {
+  if (sourceAction.type === "already-saved" && existingRecordId && !payload.replace) {
     openLibraryRecord(existingRecordId);
     setStatus(t("status.sourceAlreadySaved", { name: state.sourcePreview.name }));
     return;
+  }
+  if (sourceAction.type === "update-existing") {
+    payload.replace = true;
   }
   setImportBusy(true);
   setStatus(t("status.installingSource"));
@@ -3861,6 +3926,10 @@ async function installSource() {
         status: result.install.record.status,
         updatedAt: result.install.record.updatedAt || result.install.record.installedAt || null,
       },
+      sourceAction: {
+        type: "already-saved",
+        recordId,
+      },
     };
     renderSourcePreview(installedPreview, "installed");
     await refreshCatalogAndRuntime();
@@ -3878,6 +3947,22 @@ function getSavedSourceRecordId(preview = state.sourcePreview) {
   if (!record?.exists || !record.id) return null;
   if (record.fingerprint && preview.fingerprint && record.fingerprint !== preview.fingerprint) return null;
   return record.id;
+}
+
+function getSourceAction(preview = state.sourcePreview) {
+  if (!preview) return { type: "new", recordId: null };
+  if (preview.sourceAction?.type) return preview.sourceAction;
+  const record = preview.libraryRecord;
+  if (record?.exists && record.id && record.fingerprint === preview.fingerprint) {
+    return { type: "already-saved", recordId: record.id };
+  }
+  if (record?.exists && record.id && record.fingerprint !== preview.fingerprint) {
+    return { type: "update-existing", recordId: record.id };
+  }
+  if ((preview.relatedRecords || []).length > 0) {
+    return { type: "new-version", recordId: null };
+  }
+  return { type: "new", recordId: null };
 }
 
 function openLibraryRecord(recordId) {
@@ -3908,9 +3993,15 @@ function setImportBusy(isBusy) {
 function syncImportActions() {
   elements.previewSourceButton.disabled = state.importBusy;
   elements.installSourceButton.disabled = state.importBusy || !state.sourcePreview;
-  elements.installSourceButton.textContent = getSavedSourceRecordId()
-    ? t("actions.viewSavedSkill")
-    : t("actions.install");
+  const sourceAction = getSourceAction();
+  elements.installSourceButton.textContent =
+    sourceAction.type === "already-saved"
+      ? t("actions.viewSavedSkill")
+      : sourceAction.type === "update-existing"
+        ? t("actions.updateSavedSkill")
+        : sourceAction.type === "new-version"
+          ? t("actions.saveNewVersion")
+          : t("actions.install");
 }
 
 function renderAiSettingsForm() {

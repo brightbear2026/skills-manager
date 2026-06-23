@@ -747,6 +747,27 @@ Use the imported skill.
     /Imported from a source path/,
   );
 
+  const samePreview = await previewSkillSource({ source: sourceSkill }, options);
+  assert.equal(samePreview.sourceAction.type, "already-saved");
+  assert.equal(samePreview.libraryRecord.id, "incoming-skill@2.0.0");
+
+  await writeFile(
+    path.join(sourceSkill, "SKILL.md"),
+    `---
+name: incoming-skill
+description: Imported from a source path.
+version: 2.1.0
+---
+
+Use the imported skill v2.1.
+`,
+    "utf8",
+  );
+  const newVersionPreview = await previewSkillSource({ source: sourceSkill }, options);
+  assert.equal(newVersionPreview.sourceAction.type, "new-version");
+  assert.equal(newVersionPreview.relatedRecords.length, 1);
+  assert.equal(newVersionPreview.relatedRecords[0].version, "2.0.0");
+
   const detail = await getLibraryRecordDetail(installed.install.record.id, options);
   assert.equal(detail.id, "incoming-skill@2.0.0");
   assert.equal(detail.name, "incoming-skill");
@@ -1695,6 +1716,7 @@ Use the updated git skill.
   assert.equal(updatePreview.origin.resolvedCommit, secondCommit);
   assert.equal(updatePreview.libraryRecord.exists, true);
   assert.equal(updatePreview.libraryRecord.id, "git-skill@1.0.0");
+  assert.equal(updatePreview.sourceAction.type, "update-existing");
   assert.ok(updatePreview.diff.changed >= 2);
   assert.ok(updatePreview.diff.modified.some((file) => file.path === "SKILL.md"));
   assert.ok(updatePreview.diff.added.some((file) => file.path === "README.md"));
@@ -1859,7 +1881,9 @@ test("ai interpretation sends locale guidance to compatible providers", async ()
 
   const originalFetch = globalThis.fetch;
   let capturedRequest;
+  let requestCount = 0;
   globalThis.fetch = async (url, request) => {
+    requestCount += 1;
     capturedRequest = {
       url,
       body: JSON.parse(request.body),
@@ -1871,7 +1895,7 @@ test("ai interpretation sends locale guidance to compatible providers", async ()
           {
             message: {
               content:
-                '{"summary":"用于整理技能。","riskExplanation":"没有明显本地风险信号。","recommendation":"可以先加入本机库。"}',
+                '{"summary":"用于整理技能。","capabilities":"整理和解释本地 skills。","useCases":"当用户需要理解 skills 时使用。","howToUse":"先扫描，再阅读结果。","inputsOutputs":"输入为 SKILL.md，输出为说明。","riskExplanation":"没有明显本地风险信号。","filesToReview":"SKILL.md","recommendation":"可以先加入本机库。","distributionDecision":"可先保存，复制前再确认。"}',
             },
           },
         ],
@@ -1886,6 +1910,7 @@ test("ai interpretation sends locale guidance to compatible providers", async ()
         preview: {
           name: "demo",
           description: "Demo skill",
+          fingerprint: "same-fingerprint",
           body: "Use this skill to organize local agent skills.",
           risk: { level: "low", findings: [] },
         },
@@ -1893,11 +1918,30 @@ test("ai interpretation sends locale guidance to compatible providers", async ()
       options,
     );
     assert.equal(result.provider, "kimi");
+    assert.equal(result.sections.capabilities, "整理和解释本地 skills。");
+    assert.equal(result.sections.distributionDecision, "可先保存，复制前再确认。");
     assert.equal(capturedRequest.url, "https://api.example.test/v1/chat/completions");
     assert.equal(capturedRequest.body.model, "kimi-test");
     assert.match(capturedRequest.body.messages[1].content, /Simplified Chinese/);
     assert.match(capturedRequest.body.messages[1].content, /"language": "zh"/);
     assert.match(capturedRequest.body.messages[1].content, /organize local agent skills/);
+
+    const cached = await interpretSkillWithAi(
+      {
+        locale: "zh",
+        preview: {
+          name: "demo",
+          description: "Demo skill",
+          fingerprint: "same-fingerprint",
+          body: "Use this skill to organize local agent skills.",
+          risk: { level: "low", findings: [] },
+        },
+      },
+      options,
+    );
+    assert.equal(cached.cached, true);
+    assert.equal(cached.sections.capabilities, "整理和解释本地 skills。");
+    assert.equal(requestCount, 1);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -2006,6 +2050,7 @@ test("ai interpretation parser normalizes json and text responses", () => {
     "recommendation": "Add to the local library."
   }`);
   assert.equal(parsed.summary, "Reads SKILL.md and explains workflows.");
+  assert.equal(parsed.capabilities, "");
   assert.equal(parsed.riskExplanation, "No script files were found.");
   assert.equal(parsed.recommendation, "Add to the local library.");
 

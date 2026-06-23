@@ -1,8 +1,10 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { getManagerHome } from "./runtimeStore.mjs";
 
 const SETTINGS_FILE = "ai-settings.json";
+const INTERPRETATIONS_FILE = "ai-interpretations.json";
 const DEFAULT_SETTINGS = {
   enabled: false,
   provider: "openai-compatible",
@@ -54,6 +56,19 @@ export async function testAiSettingsConnection(payload = {}, options = {}) {
 }
 
 export async function interpretSkillWithAi(payload = {}, options = {}) {
+  const preview = payload.preview || payload;
+  const locale = normalizeLocale(payload.locale || payload.language || preview.locale);
+  const cacheKey = buildInterpretationCacheKey(preview, { locale });
+  if (!payload.force) {
+    const cached = await readCachedInterpretation(cacheKey, options);
+    if (cached) {
+      return {
+        ...cached,
+        cached: true,
+      };
+    }
+  }
+
   const settings = await readAiSettings(options);
   if (!settings.enabled) {
     const error = new Error("AI interpretation is not enabled.");
@@ -63,8 +78,6 @@ export async function interpretSkillWithAi(payload = {}, options = {}) {
   }
   ensureAiSettingsComplete(settings);
 
-  const preview = payload.preview || payload;
-  const locale = normalizeLocale(payload.locale || payload.language || preview.locale);
   const prompt = buildInterpretationPrompt(preview, { locale });
   const text = await requestChatCompletion(
     settings,
@@ -72,7 +85,7 @@ export async function interpretSkillWithAi(payload = {}, options = {}) {
       {
         role: "system",
         content:
-          "You help a local macOS Agent Skills manager explain skills. Be concise, practical, and safety-aware. The local scanner provides risk signals; you explain them and suggest next steps. Do not claim the skill is safe. Return only JSON.",
+          "You help a local Agent Skills manager explain skills. Be practical, concrete, and safety-aware. The scanner provides local signals; you explain what the skill appears to do, when a user would use it, what files matter, risks, and the next action. Do not claim the skill is safe. Return only JSON.",
       },
       {
         role: "user",
@@ -83,13 +96,17 @@ export async function interpretSkillWithAi(payload = {}, options = {}) {
   );
 
   const sections = parseAiInterpretation(text);
-  return {
+  const result = {
     provider: settings.provider,
     model: settings.model,
     interpretedAt: new Date().toISOString(),
+    cacheKey,
+    cached: false,
     text,
     sections,
   };
+  await writeCachedInterpretation(cacheKey, result, options);
+  return result;
 }
 
 export function parseAiInterpretation(text) {
@@ -102,18 +119,32 @@ export function parseAiInterpretation(text) {
     const parsed = JSON.parse(jsonText);
     return {
       summary: cleanSection(parsed.summary || parsed.whatItDoes || parsed.what_it_does),
+      capabilities: cleanSection(parsed.capabilities || parsed.whatItCanDo || parsed.what_it_can_do),
+      useCases: cleanSection(parsed.useCases || parsed.use_cases || parsed.whenToUse || parsed.when_to_use),
+      howToUse: cleanSection(parsed.howToUse || parsed.how_to_use || parsed.workflow),
+      inputsOutputs: cleanSection(parsed.inputsOutputs || parsed.inputs_outputs || parsed.io),
       riskExplanation: cleanSection(
         parsed.riskExplanation || parsed.risk_explanation || parsed.riskSignals || parsed.risk_signals,
       ),
+      filesToReview: cleanSection(parsed.filesToReview || parsed.files_to_review || parsed.reviewFiles),
       recommendation: cleanSection(
         parsed.recommendation || parsed.recommendedNextStep || parsed.recommended_next_step,
+      ),
+      distributionDecision: cleanSection(
+        parsed.distributionDecision || parsed.distribution_decision || parsed.copyDecision || parsed.copy_decision,
       ),
     };
   } catch {
     return {
       summary: raw,
+      capabilities: "",
+      useCases: "",
+      howToUse: "",
+      inputsOutputs: "",
       riskExplanation: "",
+      filesToReview: "",
       recommendation: "",
+      distributionDecision: "",
     };
   }
 }
@@ -136,7 +167,7 @@ function buildInterpretationPrompt(preview = {}, options = {}) {
     {
       language: locale,
       task:
-        `Explain this Agent Skill for a local user. ${languageInstruction} Return only JSON with string fields: summary, riskExplanation, recommendation. summary says what it does. riskExplanation explains the local risk signals from the scanner and should say when there are no obvious local signals. recommendation gives one practical next step: add to library, inspect first, block, or do not distribute yet.`,
+        `Explain this Agent Skill for a local user. ${languageInstruction} Return only JSON with string fields: summary, capabilities, useCases, howToUse, inputsOutputs, riskExplanation, filesToReview, recommendation, distributionDecision. Be specific and infer from SKILL.md instructions and file names. summary is one short paragraph. capabilities lists what the skill can help the agent do. useCases says when a user would pick it. howToUse explains the likely workflow in plain language. inputsOutputs describes likely inputs, outputs, or side effects. riskExplanation explains scanner risk signals and says when there are no obvious local signals. filesToReview lists the most relevant files to inspect. recommendation gives one practical next step: save, inspect first, block, or do not copy yet. distributionDecision says whether it should be copied to agents now and why.`,
       skill: {
         name: preview.name,
         description: preview.description,
@@ -150,12 +181,68 @@ function buildInterpretationPrompt(preview = {}, options = {}) {
         validation: preview.validation || [],
         files,
         frontmatter: preview.frontmatter || {},
-        instructionsPreview: String(preview.bodyPreview || preview.body || "").slice(0, 3000),
+        instructionsPreview: String(preview.bodyPreview || preview.body || "").slice(0, 6000),
       },
     },
     null,
     2,
   );
+}
+
+function buildInterpretationCacheKey(preview = {}, options = {}) {
+  const locale = normalizeLocale(options.locale);
+  const stableId =
+    preview.id ||
+    preview.recordId ||
+    preview.libraryRecord?.id ||
+    preview.governance?.recordId ||
+    preview.fingerprint ||
+    [
+      preview.name || "",
+      preview.version || "",
+      preview.sourceType || "",
+      preview.origin?.url || preview.origin?.path || preview.path || "",
+    ].join("|");
+  const fingerprint = preview.fingerprint || preview.governance?.fingerprint || "";
+  const raw = `${locale}\n${stableId}\n${fingerprint}`;
+  return createHash("sha256").update(raw).digest("hex");
+}
+
+async function readCachedInterpretation(cacheKey, options) {
+  const index = await readInterpretationIndex(options);
+  return index.items?.[cacheKey] || null;
+}
+
+async function writeCachedInterpretation(cacheKey, interpretation, options) {
+  const index = await readInterpretationIndex(options);
+  index.items[cacheKey] = {
+    ...interpretation,
+    cacheKey,
+    cached: false,
+  };
+  await writeInterpretationIndex(index, options);
+}
+
+async function readInterpretationIndex(options) {
+  const home = getManagerHome(options);
+  try {
+    const parsed = JSON.parse(await readFile(path.join(home, INTERPRETATIONS_FILE), "utf8"));
+    return {
+      version: 1,
+      items: parsed.items && typeof parsed.items === "object" ? parsed.items : {},
+    };
+  } catch {
+    return {
+      version: 1,
+      items: {},
+    };
+  }
+}
+
+async function writeInterpretationIndex(index, options) {
+  const home = getManagerHome(options);
+  await mkdir(home, { recursive: true });
+  await writeFile(path.join(home, INTERPRETATIONS_FILE), `${JSON.stringify(index, null, 2)}\n`, "utf8");
 }
 
 function normalizeLocale(value) {

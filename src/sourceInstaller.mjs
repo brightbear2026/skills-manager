@@ -322,7 +322,8 @@ async function buildPreview(prepared, options) {
     files,
   });
   const version = String(parsed.frontmatter?.version || "unversioned");
-  const libraryRecord = await findMatchingLibraryRecord(parsed.name, version, options);
+  const libraryMatches = await findLibraryMatches(parsed.name, version, options);
+  const libraryRecord = libraryMatches.sameVersion;
   const diff =
     libraryRecord.exists && libraryRecord.fingerprint !== fingerprint
       ? await diffSkillDirectories(libraryRecord.libraryPath, prepared.skillPath)
@@ -338,6 +339,13 @@ async function buildPreview(prepared, options) {
     fingerprint,
     risk,
     libraryRecord,
+    relatedRecords: libraryMatches.relatedRecords,
+    sourceAction: buildSourceAction({
+      fingerprint,
+      libraryRecord,
+      relatedRecords: libraryMatches.relatedRecords,
+      diff,
+    }),
     diff,
     validation: parsed.validation,
     files: files.map(({ preview, ...file }) => file),
@@ -347,16 +355,23 @@ async function buildPreview(prepared, options) {
   };
 }
 
-async function findMatchingLibraryRecord(name, version, options) {
+async function findLibraryMatches(name, version, options) {
   const library = await getLibraryCatalog(options);
-  const record = library.records.find((item) => item.name === name && item.version === version);
-  if (!record) {
-    return {
+  const relatedRecords = library.records
+    .filter((item) => item.name === name)
+    .map(toPreviewLibraryRecord)
+    .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+  const record = relatedRecords.find((item) => item.version === version);
+  return {
+    sameVersion: record || {
       exists: false,
       id: null,
-    };
-  }
+    },
+    relatedRecords,
+  };
+}
 
+function toPreviewLibraryRecord(record) {
   return {
     exists: true,
     id: record.id,
@@ -371,6 +386,40 @@ async function findMatchingLibraryRecord(name, version, options) {
     status: record.status,
     updatedAt: record.updatedAt || record.installedAt || null,
     publications: (record.publishedTo || []).length,
+  };
+}
+
+function buildSourceAction({ fingerprint, libraryRecord, relatedRecords, diff }) {
+  if (libraryRecord?.exists && libraryRecord.fingerprint === fingerprint) {
+    return {
+      type: "already-saved",
+      recordId: libraryRecord.id,
+      label: "Already saved",
+      summary: "This exact version is already managed.",
+    };
+  }
+  if (libraryRecord?.exists && libraryRecord.fingerprint !== fingerprint) {
+    return {
+      type: "update-existing",
+      recordId: libraryRecord.id,
+      label: "Update existing version",
+      summary: "A saved skill with the same name and version has different content.",
+      changed: diff?.changed || 0,
+    };
+  }
+  if ((relatedRecords || []).length > 0) {
+    return {
+      type: "new-version",
+      recordId: null,
+      label: "Save as new version",
+      summary: "A skill with this name is already managed, but this version is new.",
+    };
+  }
+  return {
+    type: "new",
+    recordId: null,
+    label: "Save skill",
+    summary: "This skill is not managed yet.",
   };
 }
 
